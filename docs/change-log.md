@@ -136,3 +136,92 @@ reason the instruction required configuration to be confirmed before deletion.
 
 Logins remaining: Ramesh Owner (owner), Master Admin (owner + technician),
 Suresh Technician (technician). Perf Bench removed.
+
+## Performance — dev preview diagnosis and publication
+
+Commits `b4e494c`, `ab79e5f`
+
+The owner reported 5–10 second navigation. The first pass measured against a warm
+local dev server on the build machine and reported 0.6–0.9s, which did not match
+what he experienced and should not have been relayed as a fix.
+
+Measured properly — phone viewport, throttled mobile link, dev preview:
+
+| | Total | Code fetching | Data | Code requests |
+| --- | --- | --- | --- | --- |
+| Dashboard → Spares Stock | 4.3s | 3.44s | 0.32s | 27 |
+| Dashboard → Spares Purchase | 2.7s | 2.25s | 0.36s | 29 |
+
+Roughly 80% of every click was code delivery; the database was not involved. On
+Spares Stock the data request did not begin until 3.6s in. Immediately after any
+edit the preview recompiles and the same click took **18.2s across 93 requests**.
+
+Production build, same conditions: Spares Stock **2.3s** on phone and **0.52s** on
+desktop; Spares Purchase **0.67s** / **0.70s**, with zero on-demand code requests.
+
+**Root cause: the unpublished development preview compiling and shipping the app
+piece by piece on every click.** The app was published to
+`https://vservice-mobile-service-erp.lovable.app`, which resolves it.
+
+Genuine application fixes made alongside: preloading now triggers on touch
+(`pointerdown`/`touchstart`) rather than hover, which does nothing on Android;
+permissions resolve once per session; masters cache for ten minutes. Background
+route warming is enabled only in production — it was measured making the dev
+preview *worse* by starving the screen the user had tapped, and was disabled there
+rather than shipped because it sounded reasonable.
+
+Route weight was checked and found not to be a problem — both screens are 6–9 KB
+with no charts or export libraries — so nothing was split.
+
+## Security audit
+
+Commits `8ef0c75`, `87e3dd6`
+
+Audited against the live database with real logins, not by reading code.
+
+### Critical — fixed
+
+1. **Open self-registration with attacker-chosen roles.** The signup handler took
+   the role from user-supplied metadata, so any stranger could have created an
+   **owner** account on a publicly reachable ERP. Demonstrated by registering a
+   working technician account. Sign-up is now refused at the database; a login can
+   only exist if the owner first adds it in Users & Roles, and that entry sets the
+   role. Re-tested: registration as "owner" is rejected, no account created.
+2. **Two RPCs answered unauthenticated callers** — the dashboard summary and the
+   WhatsApp templates were readable from the open internet. `EXECUTE` is now
+   revoked from `anon`/`public` across the schema.
+
+### High — fixed
+
+3. **The technician role held all 70 permissions**, including delete, approve,
+   posting payments and expenses, and `view_cost`.
+4. **Purchase cost was readable off the items table** by any staff login,
+   bypassing report-layer masking. Now denied at column level; the owner reads it
+   through a protected route.
+
+### Verified sound, unchanged
+
+Technicians cannot self-grant roles, write permission overrides, read other
+profiles, delete a customer, post a payment or expense, post a stock adjustment,
+cancel an invoice or change settings — each attempted live and refused. Ledgers
+cannot be written directly. Device lock PINs and patterns are genuinely encrypted
+with a vault-held key. Delivery OTPs are hashed and time-limited. Job photos are
+in a private bucket; an unauthenticated URL guess returns nothing. Document
+numbering locks the row. No admin key is present in the browser bundle.
+
+### Medium — owner action outstanding
+
+Leaked-password protection is disabled. Supabase dashboard → project →
+Authentication → Sign In / Providers → Password → enable **Prevent use of leaked
+passwords**, set minimum length to 10.
+
+### Note on the fix for finding 3
+
+The audit's first fix cut the technician to 13 permissions, removing Spares
+Purchase, Payments and Expenses entirely — the same over-trim as Phase D, and
+against the stated requirement. Corrected to: **view broadly, create/edit
+narrowly, delete/approve/view_cost never** — 32 permissions. Purchase money
+columns (rate, discount, taxable value, tax, freight, paid, total) are now refused
+at the database rather than merely omitted by the screen, so the technician sees
+that a part arrived, with quantity and date, and no rates even via direct API
+calls.
