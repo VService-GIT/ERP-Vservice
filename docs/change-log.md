@@ -225,3 +225,88 @@ columns (rate, discount, taxable value, tax, freight, paid, total) are now refus
 at the database rather than merely omitted by the screen, so the technician sees
 that a part arrived, with quantity and date, and no rates even via direct API
 calls.
+
+## Accounts, staff management and workflow simplification
+
+Commits `e1bbc68`, `6c2bacc`, `084b9ff`, `46ddfc2`, `e085072`
+
+### Roles and accounts
+
+- **Invite dialog offered only Technician.** It was hardcoded during the two-role
+  scoping. Now offers **Owner and Technician**, each with a one-line explanation,
+  Technician preselected. The role still comes from the owner-written
+  `signup_invites` row, never from anything the invited person types — verified
+  that a technician cannot write an invite row, self-promote, or call the invite
+  function (403), so adding the Owner option did not reopen the self-registration
+  hole.
+- **Corrected the dialog's wording.** It claimed "They receive an email invite".
+  No mail service is configured and nothing was ever sent — the app shows a
+  one-time password instead. An owner following the old wording would have waited
+  for an email that never arrives.
+- **Account roles settled.** `Appsmdass@gmail.com` (Master Admin) is the
+  developer's login; `satheesh.ns30@gmail.com` (Satheesh) is the shop owner. He
+  had been created as a technician before the role picker existed and was promoted
+  to owner, keeping his profile, phone and password.
+
+### Master Admin protection
+
+Enforced by database triggers, matched by email at runtime rather than by UUID, so
+it survives the account being recreated. The account cannot be deleted,
+deactivated, stripped of its owner role, downgraded, have permission overrides
+applied, or **have its password reset by anyone else** — the last of these matters
+because password reset is an account-takeover primitive that would otherwise let
+another owner walk past every other guard.
+
+Each attack was fired directly at the database, bypassing the app and RLS, and
+each was refused with a clear message. The password-reset guard was tested by
+capturing the real reset request from the browser and replaying it against the
+protected account's id. Ordinary use is unaffected: the account edits its own
+name, phone and password normally, and managing other staff is not restricted.
+
+### Staff management
+
+- **Edit action** on each row — name, phone and role, owner-only and enforced in
+  the server function, respecting both the last-owner safeguard and the Master
+  Admin guard.
+- **Reset password** with an editable field, a Generate button, Copy, and a
+  show/hide toggle. Nothing is applied until confirmed — the first implementation
+  reset the password the instant the dialog opened, so merely looking would have
+  broken someone's login. Sessions are invalidated on change.
+- **Password field on invite**, so a login can be created with a chosen password;
+  left blank, one is generated. Minimum length validated **server-side**, not only
+  in the browser.
+- **The Active column was misleading.** Master Admin's toggle rendered grey
+  because the protection disabled it, which was indistinguishable from the account
+  being switched off — on the one row where certainty matters most. It now shows
+  an **"Active · Protected"** badge with a lock; the current user's own row shows
+  "Active · You".
+
+### Job workflow reduced to four steps
+
+Sixteen statuses suited a large service centre with separate diagnostic, repair and
+QC staff. This is a two-person shop where one person does all three.
+
+**Received → In repair → Ready for delivery → Delivered**, with Cancelled as an
+owner-only exception. Existing rows migrated; board columns, mobile tabs, filters,
+badges, dashboard counters and reports all updated. History entries keep their
+original wording rather than being rewritten.
+
+Preserved deliberately while simplifying, rather than lost with the statuses that
+carried them:
+
+- **Estimate over-run confirmation** — moved into the delivery dialog. A bill past
+  the quoted figure beyond the tolerance still cannot go out until an owner
+  confirms the customer agreed.
+- **QC checklist** — folded into the hand-back tab as optional, not deleted.
+- **Refusal to deliver an unbilled job** unless warranty or no-charge.
+- **One job, one bill.**
+
+Delivery now generates the bill and immediately presents it with a prominent
+**Send bill on WhatsApp** button, and the fourth tab becomes **Invoice** once
+delivered — bill number and date, spare lines, service charges, discount, advance
+adjusted, total and balance, with A4 / 80mm / 58mm printing and WhatsApp share.
+
+**Not behaviour-verified.** The agent could not create an authenticated session
+against the project's own Supabase, so this change is compile-verified only. It
+altered the status enum, the transition rules and the delivery path together, so a
+real job should be booked through to delivery before the shop relies on it.

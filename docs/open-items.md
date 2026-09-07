@@ -2,17 +2,23 @@
 
 ## Needs the owner
 
-- **Sign in as `Ramesh Owner` and confirm it works.** Once confirmed, the
-  `Master Admin` login should be deleted. It currently holds owner + technician
-  roles, meaning **two accounts can see profit figures** where the requirement
-  says one. It was retained only as a fallback in case `Master Admin` is the
-  account the owner personally uses.
+- **Run one job end to end on the published site.** This is the main outstanding
+  item. The loop was verified before the data purge, but not after it, and the
+  workflow has since been rewritten from sixteen statuses to four — touching the
+  status enum, the transition rules and the delivery path in one change. That
+  rewrite is compile-verified only, because no authenticated session can be created
+  against the project's Supabase from the build environment. Book one device from
+  intake through the three steps to delivery, with a spare, a service charge and a
+  payment, and check the bill, the WhatsApp link and the Invoice tab.
 
-- **End-to-end test on the clean database has not been run.** Creating a job sheet
-  requires an authenticated owner session, and the project's Supabase instance
-  cannot have a session minted from the build environment. The full
-  job → spares → delivery → payment loop was verified before the purge, but not
-  after it. This should be done once before real use.
+- **Enable leaked-password protection** (see Medium, below).
+
+- **Create the technician login.** Users & Roles → Invite staff, Technician role.
+  Nothing is emailed; a one-time password is shown on screen to pass on.
+
+- **Confirm navigation speed on the published URL.** The 5-second delay was traced
+  to the unpublished dev preview compiling each screen on click. Publishing should
+  resolve it, but this has not been confirmed from the shop's own connection.
 
 ## Verification status
 
@@ -38,6 +44,15 @@ Verified with a caveat:
   With every transactional table empty the result is sound, but it is an
   emulation of the call rather than the call itself.
 
+## Accounts
+
+| Login | Role | Note |
+| --- | --- | --- |
+| Appsmdass@gmail.com | owner | Developer. Protected at the database — cannot be deleted, deactivated, downgraded, or have its password reset by anyone else. |
+| satheesh.ns30@gmail.com | owner | Shop owner. Promoted from technician. |
+
+Both accounts see cost and profit. There is deliberately no technician login yet.
+
 ## Bugs found and fixed during verification
 
 These were reported as complete by the phase that introduced them, and were not.
@@ -53,6 +68,16 @@ They are recorded because they show which claims needed independent checking.
    constraint was replaced with a composite `(branch_id, job_no)` index.
 4. **GST wording leaked into ledger labels** with GST off ("Sales & output GST").
    Now reads "Sales" / "Purchases".
+5. **The reset-password dialog applied the change on open.** Merely opening it to
+   look would have broken that person's login. Nothing is applied now until
+   confirmed.
+6. **The Active column made "protected" look like "switched off".** The Master
+   Admin toggle rendered grey because the guard disabled it, which was
+   indistinguishable from a deactivated account — on the one row where the
+   developer most needs certainty. Now an explicit "Active · Protected" badge.
+7. **The invite dialog promised an email that is never sent.** No mail service is
+   configured; a one-time password is shown instead. Anyone following the old
+   wording would have waited for an invite that never arrives.
 
 ## Known issues
 

@@ -4,7 +4,7 @@
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `87e3dd6`
+- Head commit: `e085072`
 
 **Overall: ready for a supervised first week of real use.** Every stated
 requirement is met and the security holes found have been closed. Two items remain
@@ -15,7 +15,7 @@ before it should carry a full day's takings unsupervised — both listed below.
 | # | Requirement | Status |
 | --- | --- | --- |
 | — | Service modules only, no retail sales | Done — POS hidden, routes redirect to Job Sheets |
-| — | Jobsheet → diagnosed → repaired → ready → delivered | Done — full lifecycle with QC gate and delivery OTP |
+| — | Jobsheet → diagnosed → repaired → ready → delivered | Done — four steps: Received → In repair → Ready for delivery → Delivered |
 | — | Delivery bill = spare cost + service charge | Done — one job, one bill, enforced server-side |
 | 1 | Service spares stock maintenance | Done — five-tab stock screen, reorder levels, rack locations |
 | 2 | Party ledger maintenance | Done — running balance, bill-wise settlement, ageing |
@@ -37,13 +37,19 @@ database rather than by hiding a report.
 
 | Login | Role | Sees |
 | --- | --- | --- |
-| Master Admin | owner | Everything, including cost and profit |
+| Appsmdass@gmail.com — Master Admin | owner (protected) | Everything, including cost and profit |
+| satheesh.ns30@gmail.com — Satheesh | owner | Everything, including cost and profit |
 | *(to be created)* | technician | Every module; no cost, margin or profit |
 
-The shop's second login has not been created yet. The owner creates it from
-**Users & Roles → Invite staff**. No email service is configured, so the app shows
-a **one-time password on screen** to pass to the technician rather than emailing an
-invite. The path was tested end to end and works.
+Master Admin is the developer's login and is protected at the database: it cannot
+be deleted, deactivated, downgraded, or have its password reset by anyone else.
+Satheesh is the shop owner.
+
+No technician login exists yet. Create it from **Users & Roles → Invite staff**,
+choosing the Technician role. No email service is configured, so a **one-time
+password is shown on screen** to pass on — nothing is emailed. A password can also
+be typed rather than generated, and reset later from the row's Reset password
+action.
 
 Technician holds 32 permissions: view and export on every module; create and edit
 on job sheets, customers, masters/spares, stock and billing. Proven by live test
@@ -68,11 +74,14 @@ accounts, shop profile, print settings and all four WhatsApp templates.
 Supabase dashboard → project → Authentication → Sign In / Providers → Password →
 enable **Prevent use of leaked passwords**, set minimum length to 10.
 
-**2. Run one real job end to end on the published site** *(owner)*
-The full loop was proven before the data purge, but not after it on the clean
-database, because an authenticated owner session cannot be created from the build
-environment. Take one job from intake through spare issue, delivery, payment and
-WhatsApp share before trusting it with a day's work.
+**2. Run one real job end to end on the published site** *(owner)* — now the most
+important of the two.
+The loop was proven before the data purge, but not after it, and the workflow has
+since been rewritten from sixteen statuses to four, altering the status enum, the
+transition rules and the delivery path together. That change is compile-verified
+only; no authenticated session can be created against the project's Supabase from
+the build environment. Book one device from intake through spare issue, the three
+status steps, delivery, payment and WhatsApp share before the shop relies on it.
 
 **Also worth doing:** confirm navigation speed on the published URL. The 5-second
 delay was traced to the unpublished dev preview compiling each screen on click;
@@ -92,8 +101,14 @@ items were reported complete by the pass that built them and were not:
 5. Navigation performance — reported fixed against a measurement taken on the
    wrong machine.
 
-Plus two security holes that no build pass surfaced: open self-registration with
-attacker-chosen roles, and two RPCs answering anonymous callers.
+Plus three security holes that no build pass surfaced: open self-registration with
+attacker-chosen roles, two RPCs answering anonymous callers, and a technician role
+holding every permission in the system.
+
+Two further defects came from fixes themselves rather than from features: a reset
+dialog that changed someone's password merely by being opened, and an Active
+column where "protected" and "switched off" rendered identically on the one row
+where that distinction matters most.
 
 The lesson worth keeping: ask for proof by live API call against the real
 environment, not a summary of what was implemented.
