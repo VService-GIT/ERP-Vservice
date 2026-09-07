@@ -1,50 +1,73 @@
 # Open Items and Risks
 
-## In progress
+## Needs the owner
 
-- **Verification pass.** A verification-only run was requested against the live
-  database covering: technician cost blindness proven through real API calls
-  rather than code reading; technician reachability of every other screen; GST-off
-  cleanliness including server rejection of a tax amount passed directly to the
-  posting RPC; a full job → spares → delivery → split payment happy path; negative
-  stock refusal; the estimate over-run gate; and the `wa.me` link format. Results
-  are pending at the time of writing and are not assumed to pass.
+- **Sign in as `Ramesh Owner` and confirm it works.** Once confirmed, the
+  `Master Admin` login should be deleted. It currently holds owner + technician
+  roles, meaning **two accounts can see profit figures** where the requirement
+  says one. It was retained only as a fallback in case `Master Admin` is the
+  account the owner personally uses.
 
-- **Inline creation from the form in use.** Requested after review of the running
-  app:
-  - Brand and Model to be creatable from the job sheet intake form via a `+`
-    control, rather than forcing a trip to Masters mid-intake.
-  - Supplier and spare part to be creatable from the purchase bill itself.
+- **End-to-end test on the clean database has not been run.** Creating a job sheet
+  requires an authenticated owner session, and the project's Supabase instance
+  cannot have a session minted from the build environment. The full
+  job → spares → delivery → payment loop was verified before the purge, but not
+  after it. This should be done once before real use.
 
-  This matters because both are entered while a customer is standing at the
-  counter, and an unknown model or a new supplier should not interrupt the entry.
+## Verification status
+
+Verified by live API calls with real logins (commit `ba90023`, re-confirmed
+`df0861f`):
+
+- Technician receives 403 or empty on profit reports, per-job profitability,
+  purchase bills, supplier records and all cost-rate fields; owner receives them.
+- Over-issuing a spare beyond available stock throws — negative stock is
+  impossible.
+- Estimate over-run blocks delivery until re-approval is recorded.
+- GST-off forces `non_gst` with zero tax, and raw tax input is rejected.
+- `wa.me` links normalise 10-digit numbers to +91.
+- Job → 2 spares → labour → ready → delivered with split payment: stock updated,
+  ledger balanced, invoice settled. Test record reversed via `cancel_sale`.
+
+Verified with a caveat:
+
+- **`finance_reconcile` was not run as the owner after the purge.** The RPC is
+  owner-gated and no session could be created, so the equivalent aggregate query
+  was run directly instead. It returned zero receivables, zero payables and zero
+  mismatches, over-allocated bills, unbalanced journals and unbalanced vouchers.
+  With every transactional table empty the result is sound, but it is an
+  emulation of the call rather than the call itself.
+
+## Bugs found and fixed during verification
+
+These were reported as complete by the phase that introduced them, and were not.
+They are recorded because they show which claims needed independent checking.
+
+1. **Technician had full rights to every module**, including supplier bills and
+   purchase rates — the exact leak the role split existed to prevent. Phase A
+   reported cost-gating as done; it was not.
+2. **Delivery and billing was broken** by a type error in
+   `materialise_job_invoice`. The core function of the application did not work
+   after Phase C.
+3. **Job number collisions** between test and live data. The global uniqueness
+   constraint was replaced with a composite `(branch_id, job_no)` index.
+4. **GST wording leaked into ledger labels** with GST off ("Sales & output GST").
+   Now reads "Sales" / "Purchases".
 
 ## Known issues
 
-- **Seed data pollutes the pickers.** The supplier dropdown is full of
-  `PERF Party NNNN` records left over from performance benchmarking, alongside
-  real parties such as `Bangalore Distributors`. The same is likely true of items
-  and invoices — an earlier benchmark run seeded roughly 15,000 invoices, 92,000
-  ledger rows and 81,000 stock ledger rows. This should be purged before the shop
-  goes live, and purging it must respect the append-only ledger design rather than
-  deleting rows arbitrarily.
-
-- **Report performance on large data.** Benchmarking showed `report_inventory` at
+- **Report performance at volume.** Benchmarking showed `report_inventory` at
   roughly 2.1s and `report_finance` at roughly 1.5s of database time against the
-  seeded volume, driven by raw row volume rather than per-row helpers. At a single
-  shop's real data volume this is not expected to matter; if it does, the cheap fix
-  is lazy per-section fetching rather than maintained rollups, which would
-  introduce staleness.
+  seeded volume, driven by row count rather than per-row helpers. Irrelevant at a
+  single shop's real volume; if it ever matters, the cheap fix is lazy per-section
+  fetching rather than maintained rollups, which would introduce staleness.
 
 ## Deliberately retained
 
 - **Retail sales code and tables.** Hidden and route-blocked, not deleted. The job
   delivery bill posts through the same invoice engine, and retaining the code keeps
-  the option of counter sales open without a rebuild.
-
+  counter sales possible later without a rebuild.
 - **`branch_id` throughout the schema.** Invisible in the UI, but load-bearing
-  across the ledger and stock tables. Removing it would be a large and risky
-  migration for no functional gain at one shop.
-
+  across the ledger and stock tables.
 - **The serial/IMEI engine.** Retained in full, now scoped to the customer's device
   on a job sheet rather than to stock.
