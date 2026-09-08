@@ -310,3 +310,116 @@ adjusted, total and balance, with A4 / 80mm / 58mm printing and WhatsApp share.
 against the project's own Supabase, so this change is compile-verified only. It
 altered the status enum, the transition rules and the delivery path together, so a
 real job should be booked through to delivery before the shop relies on it.
+
+## Going live — real shop data
+
+Commits `23ac551`, `897f0c0`, `acd9faf`, `93e0e45`, `6b8c252`, `56eb8d8`, `73ac3c6`,
+`c1df366`
+
+### Opening stock
+
+The owner's stock report — 80 rows, all reconciling exactly (`Price × Qty = TOTAL`
+on every line) — was loaded as **80 spare items, 1,599 units, ₹27,327.50**, dated
+**1 September 2026**.
+
+Two decisions were his, not assumed: each of his tray lots stays a **separate
+item** (23 rows of CC Pin V8 remain 23 items, because that is how he counts them),
+and **selling rate = cost** for now.
+
+Normalised on the way in, and told to him rather than done silently: `SS` and `SAM`
+→ Samsung; mixed casing unified; dates embedded in model names stripped
+(`Y22 02/08/2025` → `Y22`); 16 categories created from his own vocabulary rather
+than forced into generic buckets; lot numbers kept in the item name.
+
+Posted as an **opening balance, not a purchase** — so it created no supplier
+liability and did not touch the party ledger.
+
+### Suppliers
+
+**18 real suppliers** loaded from photographs of his records, with contact person,
+both phones, email, full address, city, state and pincode. The parties record
+gained `contact_person`, `alt_phone`, `address_line1`, `address_line2`, `city` and
+`pincode`, and a unique index on `(branch_id, lower(name))` so imports cannot
+create duplicates.
+
+Data problems were flagged rather than guessed:
+
+- Chandan Mobile Shop's pincode read `29` — the Karnataka **state code**, not a
+  pincode. Left blank.
+- RS Communication's second number read `9894` — truncated. Left blank.
+- Five records had `Owner` or the business name as the contact person. Left blank,
+  because a contact called "Owner" looks filled in and is not.
+- `chenai` → Chennai and `CUDDALUR` → Cuddalore, each confirmed by the pincode on
+  the same record.
+
+The **CSV importer** now accepts that shape, reports failures by spreadsheet row
+with a reason, and refuses duplicates. Header:
+`Business name,Contact person,Phone,Alternate phone,Email,Address line 1,Address line 2,City,State,Pincode,Party type`
+
+### Opening balances
+
+**Payables ₹49,099.00** — SVS Mobiles ₹2,850.00 and Tulsi Mobile & Electronics
+₹46,249.00, both credit, dated 1 September.
+
+This exposed a real defect. Setting an opening balance on an **existing** party was
+refused outright, and `finance_reconcile` counted only supplier bills — so even had
+it saved, the amount would never have appeared as a payable. Parties now carry an
+**opening as on** date; changing the amount later posts a correcting entry (old
+reversed, new carried in); and opening amounts count towards payables and
+receivables net of anything already paid on account. Verified by posting a ₹1,000
+payment against SVS and watching the balance fall correctly.
+
+**Cash Drawer opening ₹53,949.00** as at 1 September. The bank account remains at
+zero pending the owner's figure.
+
+### Money accounts
+
+Reduced to **Cash Drawer** and one bank account. The separate UPI/QR account was
+deleted: UPI settles into the bank automatically, so a UPI balance would only ever
+be something to forget to clear.
+
+**UPI is a payment mode, not an account** — UPI and bank transfers increase the
+bank balance, cash goes to the drawer, and the day book still splits the day by
+mode so the owner can see how money came in. **Card removed** (no machine);
+**Cheque removed** on request. Modes are **Cash · UPI · Bank · On credit**, each
+removal enforced in the database so there is no dead option posting to nothing.
+
+Opening balances on accounts can be set **after** creation, posting properly and
+correcting rather than doubling — proved by setting ₹5,000, correcting to ₹1,200,
+and confirming the balance read ₹1,200.
+
+### Cash & bank ledger
+
+The owner asked where it was. It did not exist: Payments had only Register,
+Outstanding and Party ledger, and a `CashBankBook` component sat unwired in the
+codebase. Reports → Day book covered a single day, not a running account — so
+there was no way to tally the drawer at closing or reconcile against a passbook.
+
+Added as a **Cash & bank** tab: account selector, date range, opening balance,
+every movement in date order with a **running balance per row**, closing figure,
+click-through to the voucher, CSV export. The orphaned duplicate under Expenses was
+removed rather than left to be found and trusted later.
+
+### Spare creation template
+
+The quick-create dialog did not match the loaded stock: free-text name, **optional**
+category, and unit defaulting to **BOX**. Within a month the spares list would have
+been half structured and half free text, with category reports wrong and at least
+one item counted by the carton.
+
+Reshaped to the stock sheet: **Category** (required, `+` to add) → **Brand** (`+`
+to add, blank allowed) → **Model** → name auto-composed as `Category - Brand Model`
+and still editable. Unit defaults to **Nos**. MRP added as optional, matching his
+unused MOP column. Applied to both the counter dialog and the Masters form.
+
+### Test data
+
+All test documents and parties were removed: the test job sheet, purchase, payment,
+Sri Vinayaga Mobiles and Dhanush deleted outright with no orphans, and numbering
+reset so the first real job is `JOB/2026-27/0001`.
+
+**A lesson recorded rather than buried.** Six of our own test rows — two
+opening-balance pairs and a receipt with its reversal — were left visible in the
+owner's cash ledger, and he found them before we did. Reversing a test is not
+cleaning up: it leaves two rows where there should be none. Tests against a live
+database must be removed completely, or the inability to remove them stated plainly.

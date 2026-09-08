@@ -4,11 +4,25 @@
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `e085072`
+- Head commit: `c1df366`
 
-**Overall: ready for a supervised first week of real use.** Every stated
-requirement is met and the security holes found have been closed. Two items remain
-before it should carry a full day's takings unsupervised — both listed below.
+**Overall: loaded with the shop's real opening position and ready for a supervised
+first week.** Every stated requirement is met, the security holes are closed, and
+the books now hold real stock, real suppliers and a real opening balance sheet.
+What remains is listed under Outstanding.
+
+## Opening position as at 1 September 2026
+
+| | |
+| --- | --- |
+| Cash in hand | ₹53,949.00 |
+| Bank | ₹0.00 — figure not yet supplied |
+| Spares stock at cost | ₹27,327.50 across 1,599 units, 80 items |
+| Owed to suppliers | ₹49,099.00 — SVS Mobiles ₹2,850, Tulsi ₹46,249 |
+| Owed by customers | ₹0.00 |
+
+19 parties: 18 real suppliers and one customer. Document numbering starts at 1, so
+the first real job is `JOB/2026-27/0001`.
 
 ## Requirements
 
@@ -74,8 +88,8 @@ accounts, shop profile, print settings and all four WhatsApp templates.
 Supabase dashboard → project → Authentication → Sign In / Providers → Password →
 enable **Prevent use of leaked passwords**, set minimum length to 10.
 
-**2. Run one real job end to end on the published site** *(owner)* — now the most
-important of the two.
+**2. Run one real job end to end on the published site** *(owner)* — still the most
+important item.
 The loop was proven before the data purge, but not after it, and the workflow has
 since been rewritten from sixteen statuses to four, altering the status enum, the
 transition rules and the delivery path together. That change is compile-verified
@@ -83,10 +97,21 @@ only; no authenticated session can be created against the project's Supabase fro
 the build environment. Book one device from intake through spare issue, the three
 status steps, delivery, payment and WhatsApp share before the shop relies on it.
 
-**Also worth doing:** confirm navigation speed on the published URL. The 5-second
-delay was traced to the unpublished dev preview compiling each screen on click;
-publishing should resolve it, but it has not been confirmed from the shop's own
-connection.
+****3. Supply the bank figures** — opening balance as at 1 September, plus bank name,
+account number, IFSC and branch. The account exists with those fields blank.
+
+**4. Set reorder levels.** All 80 spares are at 0, so low-stock warnings never fire
+and the reorder list stays empty.
+
+**5. Set selling rates.** Every spare is currently priced at cost, so spares bill at
+zero margin.
+
+**6. Confirm navigation speed** on the published URL from the shop's own connection.
+The 5-second delay was traced to the unpublished dev preview compiling each screen
+on click; publishing should resolve it, but that is unconfirmed.
+
+**7. Check the reconciliation report once** — its four problem counts can only be
+read from a signed-in screen. Every figure feeding it is clean.
 
 ## Track record of this work
 

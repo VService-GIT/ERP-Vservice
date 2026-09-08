@@ -14,11 +14,25 @@
 - **Enable leaked-password protection** (see Medium, below).
 
 - **Create the technician login.** Users & Roles → Invite staff, Technician role.
-  Nothing is emailed; a one-time password is shown on screen to pass on.
+  Nothing is emailed; a one-time password is shown on screen to pass on. Both
+  current logins are owners.
+
+- **Supply the bank figures** — opening balance as at 1 September, and the bank
+  name, account number, IFSC and branch. The account exists with those fields
+  deliberately blank; nothing was invented.
+
+- **Set reorder levels.** All 80 spares sit at 0, so low-stock warnings never fire
+  and the reorder list is permanently empty — the feature is present but inert.
+
+- **Set selling rates.** Every spare is priced at cost, so spares bill at zero
+  margin and the profit report will show labour only.
 
 - **Confirm navigation speed on the published URL.** The 5-second delay was traced
   to the unpublished dev preview compiling each screen on click. Publishing should
   resolve it, but this has not been confirmed from the shop's own connection.
+
+- **Check the reconciliation report once.** Its four problem counts can only be read
+  from a signed-in screen. Every figure feeding it is clean.
 
 ## Verification status
 
@@ -53,6 +67,22 @@ Verified with a caveat:
 
 Both accounts see cost and profit. There is deliberately no technician login yet.
 
+## Opening position as at 1 September 2026
+
+| | |
+| --- | --- |
+| Cash in hand | ₹53,949.00 |
+| Bank | ₹0.00 — pending |
+| Spares stock at cost | ₹27,327.50 · 1,599 units · 80 items |
+| Owed to suppliers | ₹49,099.00 |
+| Owed by customers | ₹0.00 |
+
+Data problems in the owner's source records, flagged rather than guessed, and worth
+resolving with the suppliers concerned: Chandan Mobile Shop has no pincode (the
+source held the Karnataka state code); RS Communication's second number was
+truncated; five records had "Owner" or the business name in place of a contact
+name; two city names were corrected against their pincodes.
+
 ## Bugs found and fixed during verification
 
 These were reported as complete by the phase that introduced them, and were not.
@@ -78,6 +108,24 @@ They are recorded because they show which claims needed independent checking.
 7. **The invite dialog promised an email that is never sent.** No mail service is
    configured; a one-time password is shown instead. Anyone following the old
    wording would have waited for an invite that never arrives.
+8. **Opening balances could not be set on an existing party.** The attempt was
+   refused, and the reconciliation counted only supplier bills — so the amount
+   would never have appeared as a payable even if it had saved.
+9. **Saving an edited job sheet failed** while writing its history line — the
+   feature broken on arrival, caught only because the flow was actually run.
+10. **The customer lookup on a new job sheet ignored the active flag**, so a
+    deactivated customer still surfaced at the counter.
+11. **No cash or bank ledger was reachable.** `CashBankBook` sat unwired in the
+    codebase while the owner had no way to tally his drawer or reconcile a
+    passbook.
+
+## A note on testing against live data
+
+Six test rows — two opening-balance pairs and a receipt with its reversal — were
+left visible in the owner's cash ledger, and he found them before we did. Reversing
+a test is not cleaning up: it leaves two rows where there should be none. Tests
+against a live database must be removed completely, or the inability to remove them
+stated plainly rather than left for the owner to discover.
 
 ## Known issues
 
