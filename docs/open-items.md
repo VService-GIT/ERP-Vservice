@@ -2,6 +2,13 @@
 
 ## Needs the owner
 
+- **Seven jobs delivered with no bill — ₹3,900 in total.** JOB/2026-27/0001
+  (RAJENTHIRAN, Nokia Keypad, ₹150), 0003 (VINOTH, Redmi 10A, ₹150), 0004
+  (JAYASURYA, Samsung M31, ₹3,050), 0006 (karthickraj, Oppo A17, ₹50), 0007 (LATHA,
+  Vivo S1, ₹200), 0008 (KANTHAVEL, Samsung A35, ₹100), 0048 (Malathi, Lava
+  Smartphone, ₹200). The bypass that caused it is closed; these need the real
+  delivery date and payment for each before they can be billed.
+
 - **Run one job end to end on the published site.** This is the main outstanding
   item. The loop was verified before the data purge, but not after it, and the
   workflow has since been rewritten from sixteen statuses to four — touching the
@@ -73,7 +80,7 @@ Both accounts see cost and profit. There is deliberately no technician login yet
 | --- | --- |
 | Cash in hand | ₹53,949.00 |
 | Bank | ₹0.00 — pending |
-| Spares stock at cost | ₹27,327.50 · 1,599 units · 80 items |
+| Spares stock at cost | ₹29,357.50 · 1,604 units · 99 items |
 | Owed to suppliers | ₹49,099.00 |
 | Owed by customers | ₹0.00 |
 
@@ -118,6 +125,29 @@ They are recorded because they show which claims needed independent checking.
 11. **No cash or bank ledger was reachable.** `CashBankBook` sat unwired in the
     codebase while the owner had no way to tally his drawer or reconcile a
     passbook.
+12. **The delivery button skipped billing.** It called `set_job_status` instead of
+    `job_deliver_impl`, so a job could reach delivered with no invoice, no ledger
+    entry and no revenue — and seven did. The status dropdown allowed the same
+    thing, and a direct data edit allowed it a third way. All three are closed, the
+    third at the database so a future change cannot reopen it.
+13. **Issued parts rendered as an empty job.** The parts query asked for
+    `cost_rate`, revoked at column level, and the block discarded the whole result.
+    A job holding ₹100 of parts and ₹100 of labour displayed as empty and worth
+    ₹0.00. Stock was never wrong; only the display was.
+14. **Labour was collected per part rather than per job sheet**, which would have
+    multiplied a single service charge by the number of spares used.
+15. **A uniqueness index on party name**, added during the supplier import, blocked
+    the counter from saving two customers with the same name.
+
+## A note on diagnosing before checking
+
+Two alarms were raised to the owner and both were wrong. He was told his job totals
+were double-counted and inflated: all 54 jobs were checked and **zero** were
+affected — two screens disagreeing was a display race. He was told stock had leaked
+and not to trust his shelf counts: all 99 items reconciled with **zero**
+discrepancies, and the empty panel behind the alarm was a blocked column read. A
+diagnosis passed on as a warning should be held to the same standard of proof as a
+claim that something is fixed.
 
 ## A note on testing against live data
 

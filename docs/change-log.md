@@ -423,3 +423,105 @@ opening-balance pairs and a receipt with its reversal — were left visible in t
 owner's cash ledger, and he found them before we did. Reversing a test is not
 cleaning up: it leaves two rows where there should be none. Tests against a live
 database must be removed completely, or the inability to remove them stated plainly.
+
+## Reports, general service and the delivery bypass
+
+Five report screens were reviewed against the shop's real data. Four of the five
+complaints turned out to share one cause.
+
+### Everything assigned to Satheesh
+
+One technician works here, so "Unassigned" was never a real state — it was a
+column that could only ever be wrong. Every existing job was assigned to Satheesh
+and new job sheets default to him, so the technician report stops reporting on a
+person who does not exist.
+
+### General Service
+
+A service that consumes no spare had no way to be recorded: the job sheet expected
+parts. Added as a service type that takes labour only, skips the spare picker
+entirely, and still bills, delivers and posts like any other job.
+
+### Bill of Supply
+
+After delivery the owner needs a document to hand over. Produced with customer
+details, device details, spares and labour itemised, and **both dates** — received
+and delivered — so the customer can see how long the repair took. Titled "Bill of
+Supply" with GST off and "Tax Invoice" with GST on, matching the mode rather than
+carrying tax wording into a non-GST shop.
+
+### The delivery bypass — three holes, all closed
+
+The Deliveries tab read 0, the dashboard said 53 booked / 6 delivered, and My Jobs
+disagreed with both. One cause underneath all of it: **the delivery button called
+`set_job_status`, not `job_deliver_impl`.** It moved the job to delivered and
+skipped billing altogether. Seven jobs were marked delivered with no bill, no
+ledger entry and no revenue — which is why the delivery report was empty while the
+job list showed deliveries.
+
+Three ways existed to reach delivered without a bill, and all three are now closed:
+
+1. The delivery button, repointed at `job_deliver_impl`.
+2. The status dropdown, which allowed delivered as an ordinary transition.
+3. A direct data edit, closed at the database — `guard_job_status` now refuses
+   `delivered` unless an invoice draft exists, with the message *"Use Hand back to
+   deliver this job — that is what creates the bill."*
+
+The first two are application fixes and could be undone by a future change. The
+third cannot: the rule lives in the database, so billing is now a property of the
+data rather than a habit of the interface.
+
+### Profit report
+
+Repaired, and it reads honestly: labour only, because every spare is still priced
+at cost. That is a data gap, not a report bug, and it is listed for the owner.
+
+### Two alarms I raised that were wrong
+
+Recorded because the corrections came from checking, not from review.
+
+**"Your totals are inflated and wrong twice over."** They were not. All 54 jobs
+were checked and **zero** carried a double-counted charge. The disagreement between
+the dashboard and My Jobs was a display race — two panels reading at different
+moments — not bad data.
+
+**"Stock has leaked; do not trust your shelf counts."** It had not. All 99 items
+reconciled with **zero discrepancies**: book stock **1,604 units, ₹29,357.50**.
+Both Oppo A15 spares were correctly issued to job 0050 and stock had correctly
+reduced. The empty parts panel that prompted the alarm was a permissions fault: the
+query asked for `cost_rate`, which is revoked at column level, and the block
+discarded the whole result — so a job with ₹100 of parts and ₹100 of labour
+rendered as an empty job worth ₹0.00. The panel now reads through the `job_costs`
+RPC and shows an error when a read fails instead of showing an empty job.
+
+Correcting the stock figure as well: it was quoted as 1,599 units / ₹27,327.50, then
+1,606 / ₹29,457.50, before the reconciliation settled it at **1,604 units /
+₹29,357.50**.
+
+### Hand back
+
+**Labour is charged per job sheet, not per part.** It had been collected per line,
+which would have multiplied a single service charge by the number of spares used.
+An **Edit** option was added to Hand back so a mistake can be corrected before the
+bill is raised rather than cancelled after.
+
+### Customer names need not be unique
+
+A supplier import had added a uniqueness index on party name. It then blocked the
+counter from saving two customers called the same thing — which at a phone shop is
+routine. The index was dropped.
+
+**The phone number is the identifier**, and even it does not block a save: entering
+a number already on file shows the matching customers with their last visible job
+and offers *Use existing customer* or *Save as new*, so a shared family handset
+still books. The job-sheet lookup now returns every match rather than the first
+five.
+
+One consequence, stated rather than buried: **duplicate suppliers can now be
+created by hand too.** The same rule was applied to both party types rather than
+splitting the behaviour, because a rule that holds for one kind of party and not
+the other is a rule nobody remembers. CSV import still refuses duplicate suppliers,
+both within a batch and against existing records, reporting them as skipped rows.
+
+All 74 parties were preserved through the change. Typecheck and production build
+both pass.

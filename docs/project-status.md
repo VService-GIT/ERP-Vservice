@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 7 September 2026**
+**As at 15 September 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `c1df366`
+- Head commit: `d2317e3`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -17,12 +17,16 @@ What remains is listed under Outstanding.
 | --- | --- |
 | Cash in hand | ₹53,949.00 |
 | Bank | ₹0.00 — figure not yet supplied |
-| Spares stock at cost | ₹27,327.50 across 1,599 units, 80 items |
+| Spares stock at cost | ₹29,357.50 across 1,604 units, 99 items — reconciled, zero discrepancies |
 | Owed to suppliers | ₹49,099.00 — SVS Mobiles ₹2,850, Tulsi ₹46,249 |
 | Owed by customers | ₹0.00 |
 
-19 parties: 18 real suppliers and one customer. Document numbering starts at 1, so
-the first real job is `JOB/2026-27/0001`.
+74 parties: 18 real suppliers and the customers booked since go-live. Document
+numbering started at 1, so the first real job was `JOB/2026-27/0001`.
+
+The stock figure moved twice before it settled. It was quoted as 1,599 units /
+₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
+confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
 ## Requirements
 
@@ -38,6 +42,8 @@ the first real job is `JOB/2026-27/0001`.
 | 5 | Spares purchase adds stock; job issue reduces stock | Done — negative stock impossible at the RPC |
 | — | One firm, no branches | Done — single firm, branch and warehouse UI removed |
 | — | Two users: owner sees all, technician sees all but profit | Done — see below |
+| — | General Service — labour only, no spare | Done — skips the spare picker, bills and delivers normally |
+| — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement
 
@@ -73,16 +79,38 @@ reach Users & Roles.
 
 ## Data
 
-The database is at a clean pre-launch state. All benchmark data was purged: 12,029
+The shop is live: real stock, real suppliers, real opening balances and 54 job
+sheets booked. The paragraphs below record the pre-launch reset that preceded it.
+
+The database was taken to a clean pre-launch state before go-live. All benchmark data was purged: 12,029
 job sheets, 15,059 invoices, 92,209 ledger rows, 81,176 stock rows and 262,796 log
 rows removed; parties cut from 2,008 to 3; items from 3,006 to 4. Document
 numbering resets to 1, so the first real job sheet is **#1**.
 
-Retained: Bangalore Distributors, Sri Vinayaga Mobiles, Mohan dass; Redmi 13C 4/64,
-Redmi 13C Display, Refurb Battery R13C, USB-C Cable; 15 brands; tax rates, payment
-accounts, shop profile, print settings and all four WhatsApp templates.
+Retained through that reset: 15 brands; tax rates, payment accounts, shop profile,
+print settings and all four WhatsApp templates. The test parties and test documents
+that survived it — Bangalore Distributors, Sri Vinayaga Mobiles, Dhanush, and the
+sample items — were removed afterwards on the owner's instruction, outright rather
+than reversed.
 
 ## Outstanding
+
+**0. Seven jobs were delivered without a bill** *(needs the owner's figures)*
+Caused by the delivery bypass — the delivery button skipped billing entirely
+(see the change log). The hole is closed three ways, including at the database, but
+these seven still need their real delivery date and payment before they can be
+billed:
+
+| Job | Customer | Device | Amount |
+| --- | --- | --- | --- |
+| JOB/2026-27/0001 | RAJENTHIRAN | Nokia Keypad | ₹150 |
+| JOB/2026-27/0003 | VINOTH | Redmi 10A | ₹150 |
+| JOB/2026-27/0004 | JAYASURYA | Samsung M31 | ₹3,050 |
+| JOB/2026-27/0006 | karthickraj | Oppo A17 | ₹50 |
+| JOB/2026-27/0007 | LATHA | Vivo S1 | ₹200 |
+| JOB/2026-27/0008 | KANTHAVEL | Samsung A35 | ₹100 |
+| JOB/2026-27/0048 | Malathi | Lava Smartphone | ₹200 |
+| | | **Total** | **₹3,900** |
 
 **1. Enable leaked-password protection** *(2 minutes, owner)*
 Supabase dashboard → project → Authentication → Sign In / Providers → Password →
@@ -97,7 +125,7 @@ only; no authenticated session can be created against the project's Supabase fro
 the build environment. Book one device from intake through spare issue, the three
 status steps, delivery, payment and WhatsApp share before the shop relies on it.
 
-****3. Supply the bank figures** — opening balance as at 1 September, plus bank name,
+**3. Supply the bank figures** — opening balance as at 1 September, plus bank name,
 account number, IFSC and branch. The account exists with those fields blank.
 
 **4. Set reorder levels.** All 80 spares are at 0, so low-stock warnings never fire
@@ -125,6 +153,10 @@ items were reported complete by the pass that built them and were not:
 4. GST wording leaking into ledger labels with GST off.
 5. Navigation performance — reported fixed against a measurement taken on the
    wrong machine.
+6. Delivery itself — the delivery button called `set_job_status` and skipped
+   billing, so seven jobs reached delivered with no bill, no ledger entry and no
+   revenue. Three separate routes to that state existed; all three are now closed,
+   one of them at the database where a later change cannot reopen it.
 
 Plus three security holes that no build pass surfaced: open self-registration with
 attacker-chosen roles, two RPCs answering anonymous callers, and a technician role
@@ -135,5 +167,13 @@ dialog that changed someone's password merely by being opened, and an Active
 column where "protected" and "switched off" rendered identically on the one row
 where that distinction matters most.
 
+Two alarms in the other direction are worth recording too, because both were mine
+and both were wrong. I told the owner his job totals were double-counted: all 54
+jobs were checked and none were — the disagreement between two screens was a
+display race. I told him stock had leaked and not to trust his shelf counts: all 99
+items reconciled exactly, and the empty panel that prompted the alarm was a blocked
+column read discarding a result the interface then rendered as ₹0.00.
+
 The lesson worth keeping: ask for proof by live API call against the real
-environment, not a summary of what was implemented.
+environment, not a summary of what was implemented — and hold a diagnosis to the
+same standard before passing it on as a warning.
