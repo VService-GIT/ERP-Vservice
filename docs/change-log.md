@@ -616,3 +616,116 @@ wording rather than an invented message.
 The status control on the job sheet is unchanged, so dragging is a shortcut and
 never the only way. One side effect worth noting: the mobile job board now scrolls
 sideways across four columns instead of using tabs.
+
+## Full test pass, and the cost leak it found
+
+A complete test against the live database, every write inside a transaction that
+was rolled back. Row counts before and after were identical on every table, so the
+owner's books carry no residue — the rule set after six of our test rows were found
+in his cash ledger.
+
+### What passed
+
+The whole loop, end to end: job booked, spare issued, three status steps, Hand back,
+bill, payment. Stock fell by the issued quantity, the bill carried parts plus labour
+with zero tax as a non-GST shop, ledger debits equalled credits, the customer's
+balance returned to zero and the invoice settled.
+
+Every guard held. All three routes to `delivered` without a bill refused, including
+a direct `UPDATE`. Over-issuing beyond stock refused. A second bill from one job
+refused. Estimate over-run blocked until re-approval. `job_reverse_delivery` refused
+a billed job and refused a non-owner.
+
+Books reconciled: **1,610 units / ₹30,260.50 across 99 items, zero discrepancies**
+item by item; all five reconciliation problem counts at zero.
+
+### The cost leak — ten tables, not one
+
+The test found a technician could read cost straight out of `purchases` and
+`purchase_items`. That alone contradicted what this documentation had claimed twice:
+that cost is gated at the database rather than hidden in the screens.
+
+Rather than patch the two tables named, the same class of hole was swept for
+everywhere. **Ten more were leaking**: stock batches, stock movements, serial units,
+sale invoice lines, sale return lines, purchase returns and their lines, purchase
+orders and their lines, supplier bills, stock adjustments and their lines, stock
+transfer lines, and stock-in-transit.
+
+All now return `permission denied` to a technician on a raw call, verified by
+testing as a real technician rather than by reading the code. Owner access is
+intact — batch cost, purchase totals, adjustment values, stock value, ageing, job
+profit and sale margin all return normally, and the purchase screens, stock
+valuation and profit report still work.
+
+Found on the way: the **pay a supplier screen was reading a bill total it had no
+permission for**, so it would have shown nothing. Fixed to read through the
+protected lookup.
+
+The lesson is the instruction, not the fix: asking for a sweep of the same class of
+hole found ten times more than fixing the table that was named.
+
+### GST off now refuses a tax value
+
+It had been silently storing zero. The money was right, but a quietly discarded
+value is how a real error hides — an import or integration sending tax would have
+gone unnoticed until the returns disagreed. It now raises: *"This shop bills without
+GST, so no tax can be recorded on a job line."* Four spares still carry an 18%
+setting on the item master; that is ignored rather than blocking the counter over a
+setting nobody sent deliberately.
+
+### Not run
+
+**The drag gestures themselves were never exercised in a browser.** No test session
+can be minted against the owner's own Supabase, so the preview bounced the agent to
+the sign-in page. Everything underneath the interaction was tested and passes. This
+is recorded rather than glossed, because a passing report that quietly includes an
+untested item is how this project has gone wrong before.
+
+## Moving jobs backwards, and a parts display that lied
+
+Both found by the owner using the app, not by a review.
+
+### Backwards
+
+He could drag a card forward but not back. That was not a drag bug: backward moves
+were refused at the database, exactly as the test pass had reported
+(*Ready → Received: invalid job status change*). The rule was wrong for a workshop —
+a device marked Ready that turns out to be faulty has to go back to In repair.
+
+**Received ↔ In repair ↔ Ready for delivery now move in both directions**, by drag
+or by the status buttons, technician included, each move writing a history line.
+
+**Delivered is unchanged and deliberately so.** Still not reachable by dropping;
+still leaves only through the owner-only reversal; still refuses a billed job.
+Re-tested after the change: a direct `delivered → ready_for_delivery` is still
+refused, and skipping straight from Received to Delivered is still refused.
+
+### A return that looked like a charge
+
+After the seven jobs were reversed, job 0004's Parts tab read:
+
+```
+Displays – Samsung M31 · Issued 09 Sept · 0 × ₹1,800.00 = ₹0.00 · "1 of 1 put back into stock"
+Displays – Samsung M31 · Returned 15 Sept · 1 × ₹1,800.00 = ₹1,800.00
+```
+
+Arithmetically correct and append-only, and completely misleading at a counter: a
+returned part showing a positive ₹1,800 reads as a charge, and an issue line reading
+`0 × ₹1,800 = ₹0.00` reads as nonsense. The owner saw it and concluded the parts
+were issued while Hand back said ₹0 — he was reading the screen correctly; the
+screen was wrong.
+
+Now: **Currently issued — this is what will be billed** comes first and is the only
+billable set. Everything settled sits below under **History — nothing here is
+billed**, with a fully returned issue struck through, greyed and marked *Returned*,
+and the return itself showing as money coming off (− ₹1,800). No row is hidden or
+deleted. With history but nothing out, the tab says so plainly.
+
+### The short bill it nearly caused
+
+Hand back now warns, before billing, on any job with returned parts and nothing
+currently issued — naming each part and quantity so they can be re-picked. A
+warning, not a block, so a genuinely labour-only job still hands back freely.
+
+This was not hypothetical. Job 0004 sat at Ready for delivery with ₹1,950 of
+returned parts and ₹300 labour. Handed back as it stood, it would have billed ₹300.

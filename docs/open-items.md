@@ -2,13 +2,13 @@
 
 ## Needs the owner
 
-- **Hand back the seven reversed jobs.** All seven are back at Ready for delivery
-  with their parts returned to stock. **Re-issue the parts on the Parts tab before
-  each Hand back** — Hand back creates the bill but does not issue parts, so a job
-  handed back without re-picking them bills short. 0003 Outer Button Redmi 10A ×1
-  @ ₹150; 0004 Display M31 ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General
-  service ×1 @ ₹50; 0007 Display paste Vivo S1 ×1 @ ₹200; 0008 General service A35
-  ×1 @ ₹100. 0001 and 0048 are labour only (₹150 and ₹200).
+- **Hand back the remaining five jobs.** 0007 and 0008 are billed already
+  (INV/2026-27/0002 ₹200, /0003 ₹100). Five left at Ready for delivery.
+  **Re-issue the parts on the Parts tab first** — Hand back creates the bill but does
+  not issue parts. It now warns when a job has returned parts and nothing issued, but
+  the warning does not block. 0003 Outer Button Redmi 10A ×1 @ ₹150; 0004 Display M31
+  ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
+  0048 are labour only (₹150 and ₹200).
 
 - **Fix the three ₹1 cost prices** — both General service items and the Vivo S1
   display paste. ₹1 is a placeholder, not a purchase price, so those jobs report
@@ -45,6 +45,14 @@
 
 - **Check the reconciliation report once.** Its four problem counts can only be read
   from a signed-in screen. Every figure feeding it is clean.
+
+## Tested but not exercised
+
+**The drag gestures on the job board have never been run in a browser.** No test
+session can be minted against the owner's own Supabase, so the preview bounces to
+the sign-in page. Every rule underneath the interaction is tested and passes —
+transitions, the Delivered refusal, the owner-only reversal — but the dragging
+itself is unverified. Recorded here rather than folded into a passing report.
 
 ## Verification status
 
@@ -143,7 +151,20 @@ They are recorded because they show which claims needed independent checking.
     multiplied a single service charge by the number of spares used.
 15. **A uniqueness index on party name**, added during the supplier import, blocked
     the counter from saving two customers with the same name.
-16. **Two claims in this documentation were wrong** and are corrected in the change
+16. **Cost was readable by a technician from twelve tables.** Two were found by a
+    test pass (`purchases`, `purchase_items`); sweeping for the same class of hole
+    found ten more — stock batches, stock movements, serial units, sale invoice and
+    sale return lines, purchase returns and orders and their lines, supplier bills,
+    stock adjustments and their lines, stock transfer lines, stock-in-transit. All
+    closed at the database and re-tested as a real technician. This is the second
+    time cost-gating was claimed done and was not.
+17. **The pay-a-supplier screen read a bill total it had no permission for**, so it
+    would have displayed nothing. Found during the same sweep.
+18. **A returned part displayed as a positive charge.** On job 0004 the Parts tab
+    showed `Returned · 1 × ₹1,800 = ₹1,800` beside `Issued · 0 × ₹1,800 = ₹0.00`.
+    Both figures were right and the screen was still wrong: the owner read it as
+    parts being issued while Hand back said ₹0.
+19. **Two claims in this documentation were wrong** and are corrected in the change
     log: that Hand back re-issues parts (it creates the bill; parts are issued on
     the Parts tab), and that every spare is priced at cost (the M31 display costs
     ₹800 and charges ₹1,800 — margin does exist).

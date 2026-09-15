@@ -4,7 +4,7 @@
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `8432760`
+- Head commit: `c8e87ea`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -28,6 +28,17 @@ The stock figure moved twice before it settled. It was quoted as 1,599 units /
 ₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
 confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
+## The books as they stand, 15 September
+
+| | |
+| --- | --- |
+| Cash drawer | ₹7,700.00 — opening ₹53,949 less ₹46,249 paid to Tulsi on 11 Sep |
+| Bank | ₹500.00 — three job collections by UPI |
+| Spares stock at cost | ₹30,260.50 · 1,610 units · 99 items · reconciled, zero discrepancies |
+| Owed to suppliers | ₹5,883.00 — SVS ₹5,700, Sathya V Connect ₹153, Star ₹30. Tulsi settled |
+| Owed by customers | ₹0.00 |
+| Bills raised | 3 — INV/2026-27/0001, /0002, /0003 |
+
 ## Requirements
 
 | # | Requirement | Status |
@@ -43,6 +54,8 @@ confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 | — | One firm, no branches | Done — single firm, branch and warehouse UI removed |
 | — | Two users: owner sees all, technician sees all but profit | Done — see below |
 | — | General Service — labour only, no spare | Done — skips the spare picker, bills and delivers normally |
+| — | Move a job backwards | Done — Received ↔ In repair ↔ Ready for delivery, both ways |
+| — | Drag and drop on the job board | Done — Delivered is not a drop target; gestures untested in a browser |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement
@@ -95,20 +108,18 @@ than reversed.
 
 ## Outstanding
 
-**0. Hand back the seven reversed jobs** *(owner)*
-All seven are now back at **Ready for delivery** and their parts have been returned
-to stock. Hand back each one to produce its bill. **Re-issue the parts on the Parts
-tab first** — Hand back creates the bill but does not issue parts, so a job handed
-back without re-picking them bills short:
+**0. Hand back the remaining five jobs** *(owner)*
+0007 and 0008 are done — billed as INV/2026-27/0002 (₹200) and /0003 (₹100). Five
+left, all at Ready for delivery. **Re-issue the parts on the Parts tab first**; Hand
+back now warns when a job has returned parts and nothing issued, but it is a warning,
+not a block:
 
 | Job | Customer | Re-issue before Hand back | Labour |
 | --- | --- | --- | ---: |
 | 0001 | RAJENTHIRAN | none | ₹150 |
 | 0003 | VINOTH | Outer Button – Redmi 10A ×1 @ ₹150 | — |
-| 0004 | JAYASURYA | Display M31 ×1 @ ₹1,800 · Outer Button M31 ×1 @ ₹150 | ₹1,100 |
+| 0004 | JAYASURYA | Display M31 ×1 @ ₹1,800 · Outer Button M31 ×1 @ ₹150 | ₹300 |
 | 0006 | karthickraj | General service ×1 @ ₹50 | — |
-| 0007 | LATHA | Display paste Vivo S1 ×1 @ ₹200 | — |
-| 0008 | KANTHAVEL | General service A35 ×1 @ ₹100 | — |
 | 0048 | Malathi | none | ₹200 |
 
 **0b. Fix the three ₹1 cost prices.** Both General service items and the Vivo S1
@@ -161,6 +172,10 @@ items were reported complete by the pass that built them and were not:
    billing, so seven jobs reached delivered with no bill, no ledger entry and no
    revenue. Three separate routes to that state existed; all three are now closed,
    one of them at the database where a later change cannot reopen it.
+7. Technician cost-gating, a second time. A full test pass found `purchases` and
+   `purchase_items` readable by a technician; sweeping for the same class of hole
+   found **ten more** leaking tables. Cost had been claimed here twice as gated at
+   the database. It was not.
 
 Plus three security holes that no build pass surfaced: open self-registration with
 attacker-chosen roles, two RPCs answering anonymous callers, and a technician role
