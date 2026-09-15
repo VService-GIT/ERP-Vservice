@@ -4,7 +4,7 @@
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `d2317e3`
+- Head commit: `8432760`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -17,7 +17,7 @@ What remains is listed under Outstanding.
 | --- | --- |
 | Cash in hand | ₹53,949.00 |
 | Bank | ₹0.00 — figure not yet supplied |
-| Spares stock at cost | ₹29,357.50 across 1,604 units, 99 items — reconciled, zero discrepancies |
+| Spares stock at cost | ₹30,260.50 across 1,610 units, 99 items — after returning the parts on the seven reversed jobs |
 | Owed to suppliers | ₹49,099.00 — SVS Mobiles ₹2,850, Tulsi ₹46,249 |
 | Owed by customers | ₹0.00 |
 
@@ -95,22 +95,25 @@ than reversed.
 
 ## Outstanding
 
-**0. Seven jobs were delivered without a bill** *(needs the owner's figures)*
-Caused by the delivery bypass — the delivery button skipped billing entirely
-(see the change log). The hole is closed three ways, including at the database, but
-these seven still need their real delivery date and payment before they can be
-billed:
+**0. Hand back the seven reversed jobs** *(owner)*
+All seven are now back at **Ready for delivery** and their parts have been returned
+to stock. Hand back each one to produce its bill. **Re-issue the parts on the Parts
+tab first** — Hand back creates the bill but does not issue parts, so a job handed
+back without re-picking them bills short:
 
-| Job | Customer | Device | Amount |
-| --- | --- | --- | --- |
-| JOB/2026-27/0001 | RAJENTHIRAN | Nokia Keypad | ₹150 |
-| JOB/2026-27/0003 | VINOTH | Redmi 10A | ₹150 |
-| JOB/2026-27/0004 | JAYASURYA | Samsung M31 | ₹3,050 |
-| JOB/2026-27/0006 | karthickraj | Oppo A17 | ₹50 |
-| JOB/2026-27/0007 | LATHA | Vivo S1 | ₹200 |
-| JOB/2026-27/0008 | KANTHAVEL | Samsung A35 | ₹100 |
-| JOB/2026-27/0048 | Malathi | Lava Smartphone | ₹200 |
-| | | **Total** | **₹3,900** |
+| Job | Customer | Re-issue before Hand back | Labour |
+| --- | --- | --- | ---: |
+| 0001 | RAJENTHIRAN | none | ₹150 |
+| 0003 | VINOTH | Outer Button – Redmi 10A ×1 @ ₹150 | — |
+| 0004 | JAYASURYA | Display M31 ×1 @ ₹1,800 · Outer Button M31 ×1 @ ₹150 | ₹1,100 |
+| 0006 | karthickraj | General service ×1 @ ₹50 | — |
+| 0007 | LATHA | Display paste Vivo S1 ×1 @ ₹200 | — |
+| 0008 | KANTHAVEL | General service A35 ×1 @ ₹100 | — |
+| 0048 | Malathi | none | ₹200 |
+
+**0b. Fix the three ₹1 cost prices.** Both General service items and the Vivo S1
+display paste carry a ₹1 cost, which is a placeholder rather than a purchase price.
+Any job using them reports near-total profit on a cost figure that is fiction.
 
 **1. Enable leaked-password protection** *(2 minutes, owner)*
 Supabase dashboard → project → Authentication → Sign In / Providers → Password →
@@ -131,8 +134,9 @@ account number, IFSC and branch. The account exists with those fields blank.
 **4. Set reorder levels.** All 80 spares are at 0, so low-stock warnings never fire
 and the reorder list stays empty.
 
-**5. Set selling rates.** Every spare is currently priced at cost, so spares bill at
-zero margin.
+**5. Check selling rates.** Not every spare is priced at cost — the M31 display
+costs ₹800 and charges ₹1,800 — but the rates have never been reviewed as a set,
+and three items carry a ₹1 placeholder cost (item 0b above).
 
 **6. Confirm navigation speed** on the published URL from the shop's own connection.
 The 5-second delay was traced to the unpublished dev preview compiling each screen

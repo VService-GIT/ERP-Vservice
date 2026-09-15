@@ -525,3 +525,94 @@ both within a batch and against existing records, reporting them as skipped rows
 
 All 74 parties were preserved through the change. Typecheck and production build
 both pass.
+
+## Reversing the seven bypass deliveries
+
+The seven jobs that reached Delivered without a bill were put back to Ready for
+delivery so the owner can hand each one back properly and get a real bill.
+
+They were not where either of us expected. The owner described them as sitting in
+"In repair"; they were still marked **Delivered**. The four genuinely in In repair
+(0005, 0009, 0040, 0041) are unrelated and were left alone. Checking before writing
+is what caught that — the instruction was to stop and report on any mismatch rather
+than move whatever was found.
+
+### The reversal path
+
+`guard_job_status` refuses `delivered → ready_for_delivery`, correctly. Rather than
+weaken it, an owner-only `job_reverse_delivery()` was added that:
+
+- refuses anyone who is not an owner;
+- **refuses any job that already has a posted bill** — a billed job can only be
+  undone by cancelling its invoice, never by a status flip;
+- writes a visible history line, so a reversal is never silent.
+
+That second rule is what protects job 0050 and every correctly billed job from here
+on. Both refusals were tested live and the test block rolled back.
+
+### Stock
+
+Book stock **1,604 units / ₹29,357.50 → 1,610 units / ₹30,260.50**.
+
+| Part | Job | Cost | Charged |
+| --- | --- | ---: | ---: |
+| Outer Button – Redmi 10A | 0003 | ₹50 | ₹150 |
+| Displays – Samsung M31 | 0004 | ₹800 | ₹1,800 |
+| Outer Button – Samsung M31 | 0004 | ₹50 | ₹150 |
+| General service | 0006 | ₹1 | ₹50 |
+| Display paste – Vivo S1 | 0007 | ₹1 | ₹200 |
+| General service – Samsung A35 | 0008 | ₹1 | ₹100 |
+| **6 units** | | **₹903.00** | **₹2,450.00** |
+
+Stock rises by cost, ₹903, not by the ₹2,450 charged. The ₹1,547 difference is
+mark-up and was never stock value. Every return was appended as a new movement;
+nothing was deleted or edited.
+
+Labour was left alone: 0001 ₹150, 0004 ₹1,100, 0048 ₹200.
+
+### Two corrections
+
+**Hand back does not issue parts.** It creates the bill; parts leave stock when they
+are issued on the Parts tab. Clearing the part lines therefore means the owner must
+re-pick them before each hand back or the bill comes out short. This was my error
+and the agent caught it before the change went in, which is why the owner got a
+per-job re-issue list rather than a surprise.
+
+**Spares are not all priced at cost.** It was recorded here that every spare bills
+at zero margin; the M31 display cost ₹800 and charged ₹1,800 disproves it. Margin
+does exist on job lines, so the profit report holds more than was claimed.
+
+Worth the owner's attention: three items carry a **₹1 cost** — both General service
+lines and the Vivo S1 display paste. ₹1 is a placeholder, not a purchase price, so
+any job using them reports near-total profit on a cost figure that is fiction.
+
+### 0048's blank amount
+
+The register showed no figure against Malathi's job while the database held ₹200
+labour. Both were right: that column shows the **estimate**, which is empty. The
+labour is real.
+
+## Drag and drop on the job board
+
+Cards move between Received, In repair and Ready for delivery by dragging.
+`@dnd-kit/core`, chosen for a touch sensor with a long-press delay so an ordinary
+finger swipe still scrolls the board on the owner's Android rather than picking up
+a card by accident.
+
+**Delivered is not a drop target**, and that is the point. The job board is exactly
+where someone would try to shove a card into Delivered, which is the hole that cost
+this shop seven bills. There is no code path in the board that sets `delivered`.
+The column stays a drop zone only so it can refuse out loud: it goes dashed red
+while dragging, reads "Not a drop target — use Hand back", and releasing there
+opens a dialog with an **Open Hand back** button.
+
+Dragging *out* of Delivered calls `job_reverse_delivery()`. A technician cannot
+pick up a delivered card at all. Every other move goes through the normal status
+change, so `guard_job_status` still has the last word — the board only decides
+which columns to light up. Columns a job cannot legally reach dim and stop
+accepting drops. A refused move snaps the card back and shows the database's own
+wording rather than an invented message.
+
+The status control on the job sheet is unchanged, so dragging is a shortcut and
+never the only way. One side effect worth noting: the mobile job board now scrolls
+sideways across four columns instead of using tabs.

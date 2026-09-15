@@ -2,12 +2,17 @@
 
 ## Needs the owner
 
-- **Seven jobs delivered with no bill — ₹3,900 in total.** JOB/2026-27/0001
-  (RAJENTHIRAN, Nokia Keypad, ₹150), 0003 (VINOTH, Redmi 10A, ₹150), 0004
-  (JAYASURYA, Samsung M31, ₹3,050), 0006 (karthickraj, Oppo A17, ₹50), 0007 (LATHA,
-  Vivo S1, ₹200), 0008 (KANTHAVEL, Samsung A35, ₹100), 0048 (Malathi, Lava
-  Smartphone, ₹200). The bypass that caused it is closed; these need the real
-  delivery date and payment for each before they can be billed.
+- **Hand back the seven reversed jobs.** All seven are back at Ready for delivery
+  with their parts returned to stock. **Re-issue the parts on the Parts tab before
+  each Hand back** — Hand back creates the bill but does not issue parts, so a job
+  handed back without re-picking them bills short. 0003 Outer Button Redmi 10A ×1
+  @ ₹150; 0004 Display M31 ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General
+  service ×1 @ ₹50; 0007 Display paste Vivo S1 ×1 @ ₹200; 0008 General service A35
+  ×1 @ ₹100. 0001 and 0048 are labour only (₹150 and ₹200).
+
+- **Fix the three ₹1 cost prices** — both General service items and the Vivo S1
+  display paste. ₹1 is a placeholder, not a purchase price, so those jobs report
+  near-total profit on a cost figure that is fiction.
 
 - **Run one job end to end on the published site.** This is the main outstanding
   item. The loop was verified before the data purge, but not after it, and the
@@ -80,7 +85,7 @@ Both accounts see cost and profit. There is deliberately no technician login yet
 | --- | --- |
 | Cash in hand | ₹53,949.00 |
 | Bank | ₹0.00 — pending |
-| Spares stock at cost | ₹29,357.50 · 1,604 units · 99 items |
+| Spares stock at cost | ₹30,260.50 · 1,610 units · 99 items |
 | Owed to suppliers | ₹49,099.00 |
 | Owed by customers | ₹0.00 |
 
@@ -138,6 +143,10 @@ They are recorded because they show which claims needed independent checking.
     multiplied a single service charge by the number of spares used.
 15. **A uniqueness index on party name**, added during the supplier import, blocked
     the counter from saving two customers with the same name.
+16. **Two claims in this documentation were wrong** and are corrected in the change
+    log: that Hand back re-issues parts (it creates the bill; parts are issued on
+    the Parts tab), and that every spare is priced at cost (the M31 display costs
+    ₹800 and charges ₹1,800 — margin does exist).
 
 ## A note on diagnosing before checking
 
