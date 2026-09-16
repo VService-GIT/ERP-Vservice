@@ -46,6 +46,19 @@
 - **Check the reconciliation report once.** Its four problem counts can only be read
   from a signed-in screen. Every figure feeding it is clean.
 
+## A known position, not a surprise
+
+**Four cancelled bills carry reversals on the wrong day** — PB/0001 out by 7 days,
+PB/0005 by 15, PB/0013 by 1, PB/0014 by 13, in both the accounting and stock ledgers.
+Caused by `ledger_reverse_voucher` stamping `current_date`, since fixed for
+amendments.
+
+They were deliberately left alone. A cancellation genuinely happened on the day it
+was cancelled, the net effect across the books is zero, and only the individual days
+fail to net cleanly in the day book. Rewriting four historical entries to tidy a
+report costs more than the untidiness. Reversible if the owner ever wants the day
+book to net per day.
+
 ## Tested but not exercised
 
 **The drag gestures on the job board have never been run in a browser.** No test
@@ -164,7 +177,14 @@ They are recorded because they show which claims needed independent checking.
     showed `Returned · 1 × ₹1,800 = ₹1,800` beside `Issued · 0 × ₹1,800 = ₹0.00`.
     Both figures were right and the screen was still wrong: the owner read it as
     parts being issued while Hand back said ₹0.
-19. **Two claims in this documentation were wrong** and are corrected in the change
+19. **`ledger_reverse_voucher` dated every reversal `current_date`.** Harmless for a
+    cancellation, wrong for an amendment — a reversal would land in today's day book
+    against a bill dated weeks earlier. Found by asking what cancelling actually does
+    before building on top of it.
+20. **The purchase register printed out of date order.** Not a numbering fault —
+    backdated entries with numbers taken at posting time. Fixed by sorting, not by
+    renumbering; reusing voucher numbers would be far worse at assessment time.
+21. **Two claims in this documentation were wrong** and are corrected in the change
     log: that Hand back re-issues parts (it creates the bill; parts are issued on
     the Parts tab), and that every spare is priced at cost (the M31 display costs
     ₹800 and charges ₹1,800 — margin does exist).

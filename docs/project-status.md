@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 15 September 2026**
+**As at 16 September 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `c8e87ea`
+- Head commit: `b468f30`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -34,7 +34,7 @@ confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 | --- | --- |
 | Cash drawer | ₹7,700.00 — opening ₹53,949 less ₹46,249 paid to Tulsi on 11 Sep |
 | Bank | ₹500.00 — three job collections by UPI |
-| Spares stock at cost | ₹30,260.50 · 1,610 units · 99 items · reconciled, zero discrepancies |
+| Spares stock at cost | 1,599 units — the owner has been re-issuing parts and handing jobs back |
 | Owed to suppliers | ₹5,883.00 — SVS ₹5,700, Sathya V Connect ₹153, Star ₹30. Tulsi settled |
 | Owed by customers | ₹0.00 |
 | Bills raised | 3 — INV/2026-27/0001, /0002, /0003 |
@@ -56,6 +56,8 @@ confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 | — | General Service — labour only, no spare | Done — skips the spare picker, bills and delivers normally |
 | — | Move a job backwards | Done — Received ↔ In repair ↔ Ready for delivery, both ways |
 | — | Drag and drop on the job board | Done — Delivered is not a drop target; gestures untested in a browser |
+| — | Edit a posted purchase | Done — three paths by risk; date amendable even on consumed stock |
+| — | Purchase register in date order | Done — screen, print and export |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement

@@ -729,3 +729,83 @@ warning, not a block, so a genuinely labour-only job still hands back freely.
 
 This was not hypothetical. Job 0004 sat at Ready for delivery with ₹1,950 of
 returned parts and ₹300 labour. Handed back as it stood, it would have billed ₹300.
+
+## Amending a posted purchase
+
+The owner asked for an Edit option on spares purchases, and specifically that a date
+change carry through everywhere the original posting went. A posted purchase has
+already moved stock into batches and money into a supplier's account, so this was
+planned before any code was written — the only feature on this project treated that
+way, and it repaid the round several times over.
+
+### What the planning round established
+
+**FIFO does not run on the bill date.** `consume_batches` orders by `received_at,
+created_at` — the moment the batch was physically created. So moving a purchase's
+date cannot retrospectively change which batch a past job drew from, and cannot
+alter a cost already posted. That single fact is what made a date amendment safe.
+
+**The register running backwards is backdating, not a numbering fault.** There is one
+`PB/` series and the number is taken at the moment of posting. `/0013` was created on
+15 Sept for a 15 Sept bill; `/0023`–`/0028` were created on 16 Sept but dated 8–10
+Sept. Numbers must never be reused, so the fix is not renumbering — the register now
+**sorts by date, then voucher number**, on screen, in print and in the export, since
+the printed copy is the one that matters at assessment time.
+
+**An existing flaw, found by asking.** `ledger_reverse_voucher` stamped reversals
+`current_date`. That is wrong for any amendment — a reversal would land in today's
+day book against a bill dated weeks earlier. A date-aware variant now exists.
+
+### The three paths, split by risk
+
+| Path | Availability | Effect |
+| --- | --- | --- |
+| Bill details — bill no., supplier bill date, notes | Always | Saves instantly, no ledger movement |
+| Posting date | **Even when stock has been consumed** | Reverses on the old date, re-posts on the new one |
+| Supplier, lines, rates, freight | Only while no stock consumed | Re-posts under the same voucher number as revision 1 |
+
+The date path was widened during review. The plan had allowed it only on a bill with
+no consumption, which would have gutted the feature — 22 live batches were already
+consumed, so the owner would have been refused on most bills, for the one edit he
+actually asked for. Since FIFO runs on `received_at`, the narrow path is safe: it
+re-dates the postings and leaves batches, receipt order and every issued cost alone.
+
+### The refusals, each tested by live call
+
+> "This stock was issued on 09 Sep 2026 on JOB/2026-27/0004. The purchase cannot be
+> dated after that."
+
+Added during review. Without it, dating a purchase after its stock was issued makes
+stock-as-on-date reports go negative and shows a phone repaired with a part bought
+the following week.
+
+> "That date falls in 2025-26 but this voucher is numbered for 2026-27. Cancel this
+> bill and re-enter it in the correct year."
+
+> "Stock from this line has already been used on JOB/2026-27/0004. Quantity, rate and
+> item cannot be changed. Raise a purchase return instead, or amend only the date."
+
+> "This bill has ₹1.00 already paid or allocated. The amended total of ₹0.00 would
+> leave it over-paid."
+
+Proved on a real bill and rolled back: PB/2026-27/0003 moved 01 Sept → 28 Aug. Stock
+in on 01 Sept, reversal out on 01 Sept, new in on 28 Aug; both accounting legs
+reversed on 01 Sept and re-posted on 28 Aug. The batch kept `received_at` 09 Sept and
+cost ₹800, and the job's issued cost stayed ₹800.
+
+Append-only is intact throughout: no `stock_ledger` or `ledger_entries` row is updated
+or deleted, the voucher number never changes, and each amendment carries a revision
+counter, a reason and an audit row holding the before and after.
+
+### Four cancelled bills carry mis-dated reversals
+
+Found by asking whether the `current_date` flaw had already bitten. It had:
+PB/0001 out by 7 days, PB/0005 by 15, PB/0013 by 1, PB/0014 by 13, in both the
+accounting and stock ledgers.
+
+**Left alone, deliberately.** A cancellation genuinely happened on the day it was
+cancelled, so dating the reversal there is defensible, and the net effect across the
+books is zero — only the individual days fail to net cleanly in the day book.
+Rewriting four historical entries to tidy a report costs more than the untidiness.
+Recorded here so it is a known position rather than an undiscovered surprise, and
+reversible if the owner wants the day book to net per day.
