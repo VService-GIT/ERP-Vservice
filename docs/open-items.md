@@ -10,6 +10,16 @@
   ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
   0048 are labour only (₹150 and ₹200).
 
+- **Do one real print of a warranty bill on the shop's own printer.** The Tamil was
+  rendered in black-and-white dots at thermal resolution and comes out clear at both
+  58mm and 80mm, and the bundled font carries every letter. But some Bluetooth
+  printer apps send plain text rather than an image, and Tamil prints blank on those.
+  That cannot be tested from here.
+
+- **Send one real warranty bill on WhatsApp to your own phone.** The 4,810-character
+  link was accepted by the link service with the full terms rendered, but the
+  WhatsApp app itself was never exercised.
+
 - **Fix the three ₹1 cost prices** — both General service items and the Vivo S1
   display paste. ₹1 is a placeholder, not a purchase price, so those jobs report
   near-total profit on a cost figure that is fiction.
@@ -60,6 +70,11 @@ report costs more than the untidiness. Reversible if the owner ever wants the da
 book to net per day.
 
 ## Tested but not exercised
+
+**A warranty bill has never been printed on the shop's real printer, nor sent
+through the real WhatsApp app.** Both were verified as far as this environment
+allows — thermal-resolution rendering, font coverage, and a link the service
+accepted in full — and both still need one real run at the counter.
 
 **The drag gestures on the job board have never been run in a browser.** No test
 session can be minted against the owner's own Supabase, so the preview bounces to
@@ -184,7 +199,16 @@ They are recorded because they show which claims needed independent checking.
 20. **The purchase register printed out of date order.** Not a numbering fault —
     backdated entries with numbers taken at posting time. Fixed by sorting, not by
     renumbering; reusing voucher numbers would be far worse at assessment time.
-21. **Two claims in this documentation were wrong** and are corrected in the change
+21. **The bill named no Tamil font.** It relied on whatever font the PC or phone
+    happened to have, which is how a bill ends up printing boxes. Predated the
+    warranty work and would have hit any Tamil text. The bill now carries its own
+    font and waits for it to load.
+22. **Term 6 referred to a warranty card the app never issues.** The terms promised
+    no warranty without a card, while the system prints only an intake slip and a
+    bill — so the shop's strongest term pointed at a document the customer never
+    receives. Raised rather than built around; the owner made the bill the warranty
+    document instead.
+23. **Two claims in this documentation were wrong** and are corrected in the change
     log: that Hand back re-issues parts (it creates the bill; parts are issued on
     the Parts tab), and that every spare is priced at cost (the M31 display costs
     ₹800 and charges ₹1,800 — margin does exist).

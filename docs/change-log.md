@@ -809,3 +809,88 @@ books is zero — only the individual days fail to net cleanly in the day book.
 Rewriting four historical entries to tidy a report costs more than the untidiness.
 Recorded here so it is a known position rather than an undiscovered surprise, and
 reversible if the owner wants the day book to net per day.
+
+## Warranty terms on the bill and the WhatsApp message
+
+Warranty was already configured per job: at hand back the counter enters service
+warranty days, and the system stores the days and an expiry. Eight delivered jobs
+carry warranty — one at 365 days, four at 182, three at 30. The owner's Tamil terms
+now print on the Bill of Supply and go out with the WhatsApp bill whenever a job
+carries warranty.
+
+"Carries warranty" means **service warranty days above zero**. `is_warranty_job` is
+a different thing — it marks a free re-repair under an earlier warranty — and no job
+uses it.
+
+### Stored exactly, and owner-editable
+
+The terms live in **Settings → Service & WhatsApp**, editable by the owner, beside
+the WhatsApp templates. They are never translated, reworded, renumbered or
+truncated, and the stored text was verified byte for byte against what the owner
+sent: 678 characters, checksum matched. The owner's own numbering and his separate
+closing English line are preserved as written.
+
+### Two risks, and how they turned out
+
+**Tamil on thermal printers was a real problem, and it predated this work.** The
+bill named no Tamil font at all, so it relied on whatever the PC or phone happened
+to have installed — which is exactly how a bill ends up printing boxes. The bill now
+carries its own Tamil font and waits for it to load before printing. Rendered in
+black-and-white dots at thermal resolution, the Tamil is clear and joins correctly
+at both 58mm and 80mm; the warranty text was enlarged and darkened for thermal. On
+58mm the terms add roughly 9–10cm of paper.
+
+One risk remains and is the owner's to close: some Bluetooth printer apps send plain
+text rather than an image, and Tamil prints blank on those. **One real print on the
+shop's own printer is still outstanding.**
+
+**The WhatsApp length worry was overstated — by me.** I estimated around 6,000
+encoded characters. The real figure is **3,842** for the terms and 4,487 for a full
+warranty bill, because roughly 45% of the text is English. The link service accepted
+it and rendered the complete text, and still accepted links up to 30,888 characters.
+Recorded because the estimate was wrong in the cautious direction, which is still
+wrong.
+
+### Term 6 and the warranty card that did not exist
+
+Term 6 originally read *"Warranty Card இல்லாமல் Warranty வழங்கப்படாது"* — no warranty
+without a warranty card. **The application issues no warranty card.** It prints an
+intake slip and a bill, nothing else. So the term referred to a document the customer
+never receives, and as written it read against the shop: a customer could argue no
+card was ever given.
+
+Raised with the owner rather than built around. He chose to make the bill the
+warranty document, so term 6 became:
+
+> 6. இந்த பில் (Bill of Supply) தான் Warranty ஆவணம். இந்த பில்லை காண்பிக்காமல்
+> Warranty வழங்கப்படாது.
+
+Only line 6 changed — verified by checksum against the original with that single
+line swapped. Terms 1–5, 7 and the closing line are byte-identical. A shop that has
+already rewritten its own terms is **skipped rather than overwritten**, and
+re-running the change does nothing; both were tested and rolled back.
+
+### The line that makes the reword work
+
+A bill that is now the warranty document is worthless to the customer if it goes in
+the bin, so warranty bills print, bold and centred inside the warranty box:
+
+> இந்த பில்லை Warranty காலம் முடியும் வரை பத்திரமாக வைத்திருக்கவும்.
+
+Bill only. Not in the WhatsApp message, where the text already sits on the
+customer's phone and cannot be lost.
+
+### Checking Tamil written by someone who does not speak it
+
+Both new lines were written here, and were checked before saving rather than after
+printing. They held: **பில்லை** is the correct object form (பில் + ஐ, with ல்
+doubling after a short syllable, as கல் → கல்லை); **பத்திரமாக வைத்திருக்கவும்** is
+what a shopkeeper in Tamil Nadu would actually say, where பாதுகாப்பாக would be more
+formal; **காண்பிக்காமல்** suits a printed term where காட்டாமல் would be too casual;
+and **ஆவணம்** matches the register of the surrounding terms. The bundled font was
+confirmed to carry every letter used.
+
+One optional refinement was raised and deliberately not applied: `பில் (Bill of
+Supply) தான்` places the bracket between the word and தான். It is common on bills and
+reads fine; `இந்த பில் தான் (Bill of Supply) Warranty ஆவணம்.` flows slightly better.
+Left as the owner wrote it, and he can change it in Settings.

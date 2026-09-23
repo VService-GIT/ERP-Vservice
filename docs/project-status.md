@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 16 September 2026**
+**As at 23 September 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `b468f30`
+- Head commit: `b4a0872`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -28,16 +28,22 @@ The stock figure moved twice before it settled. It was quoted as 1,599 units /
 ₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
 confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
-## The books as they stand, 15 September
+## The shop as it stands, 23 September
+
+The shop is running on this daily. Volumes from the last verification pass:
 
 | | |
 | --- | --- |
-| Cash drawer | ₹7,700.00 — opening ₹53,949 less ₹46,249 paid to Tulsi on 11 Sep |
-| Bank | ₹500.00 — three job collections by UPI |
-| Spares stock at cost | 1,599 units — the owner has been re-issuing parts and handing jobs back |
-| Owed to suppliers | ₹5,883.00 — SVS ₹5,700, Sathya V Connect ₹153, Star ₹30. Tulsi settled |
-| Owed by customers | ₹0.00 |
-| Bills raised | 3 — INV/2026-27/0001, /0002, /0003 |
+| Job sheets | 84 |
+| Bills raised | 73 |
+| Purchases | 57 |
+| Parties | 103 |
+| Stock movements | 229 |
+| Ledger entries | 460 |
+| Jobs carrying warranty | 8 — one at 365 days, four at 182, three at 30 |
+
+Earlier snapshot, 15 September: cash ₹7,700 (opening ₹53,949 less ₹46,249 paid to
+Tulsi on 11 Sep), bank ₹500, payables ₹5,883 with Tulsi settled.
 
 ## Requirements
 
@@ -58,6 +64,7 @@ confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 | — | Drag and drop on the job board | Done — Delivered is not a drop target; gestures untested in a browser |
 | — | Edit a posted purchase | Done — three paths by risk; date amendable even on consumed stock |
 | — | Purchase register in date order | Done — screen, print and export |
+| — | Warranty terms on bill and WhatsApp | Done — owner-editable, printed only when the job carries warranty |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement
