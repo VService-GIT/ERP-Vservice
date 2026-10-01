@@ -10,6 +10,14 @@
   ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
   0048 are labour only (₹150 and ₹200).
 
+- **Open Settings → Profit taken out and enter an amount larger than the month's
+  profit.** The over-profit warning was tested at the database but has never been
+  seen on screen.
+
+- **Open the Cash & bank book and download one CSV.** The opening-balance note and
+  the empty-period message were written but never viewed signed in; the figures
+  behind them are verified.
+
 - **Do one real print of a warranty bill on the shop's own printer.** The Tamil was
   rendered in black-and-white dots at thermal resolution and comes out clear at both
   58mm and 80mm, and the bundled font carries every letter. But some Bluetooth
@@ -33,7 +41,9 @@
   intake through the three steps to delivery, with a spare, a service charge and a
   payment, and check the bill, the WhatsApp link and the Invoice tab.
 
-- **Enable leaked-password protection** (see Medium, below).
+- **Leaked-password protection cannot be enabled on the free plan.** Recorded here
+  and repeated for weeks as a two-minute toggle; it is a Pro-plan feature. The
+  switch is visible but greyed out until the owner upgrades.
 
 - **Create the technician login.** Users & Roles → Invite staff, Technician role.
   Nothing is emailed; a one-time password is shown on screen to pass on. Both
@@ -55,6 +65,23 @@
 
 - **Check the reconciliation report once.** Its four problem counts can only be read
   from a signed-in screen. Every figure feeding it is clean.
+
+## Known and deliberately left
+
+Three access gaps found during the stock-count sweep, recorded so they are known
+rather than rediscovered: a posted payment's or expense's amount can be edited
+directly; a technician can hand a job to someone else, though never take one; and a
+stock count's system quantity is typed by the screen rather than read from stock.
+
+The older finance report still opens for a technician. Its profit and cost figures
+come back blank, but it shows total sales and total expenses. This predates the
+drawings work and was left alone pending the owner's view.
+
+**A cancelled drawing stays visible as two lines** — money out, then the reversal
+in, on the same date. That month's in and out totals both include it while the
+closing stays right. Kept deliberately: it is consistent with every other
+cancellation in the system, and a special case for drawings would make the books
+less predictable, not more.
 
 ## A known position, not a surprise
 

@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 23 September 2026**
+**As at 1 October 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `b4a0872`
+- Head commit: `8638ca1`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -28,22 +28,30 @@ The stock figure moved twice before it settled. It was quoted as 1,599 units /
 ₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
 confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
-## The shop as it stands, 23 September
-
-The shop is running on this daily. Volumes from the last verification pass:
+## The shop as it stands, 1 October
 
 | | |
 | --- | --- |
-| Job sheets | 84 |
-| Bills raised | 73 |
-| Purchases | 57 |
-| Parties | 103 |
-| Stock movements | 229 |
-| Ledger entries | 460 |
-| Jobs carrying warranty | 8 — one at 365 days, four at 182, three at 30 |
+| Job sheets | 120 |
+| Bills raised | 100 |
+| Purchases | 67 |
+| Parties | 139 |
+| Expenses | 22 |
+| Ledger entries | 615 — Dr ₹333,978.00 / Cr ₹329,128.00 |
 
-Earlier snapshot, 15 September: cash ₹7,700 (opening ₹53,949 less ₹46,249 paid to
-Tulsi on 11 Sep), bank ₹500, payables ₹5,883 with Tulsi settled.
+**September, from the Monthly summary** — stock and both cash accounts tie to the
+paisa:
+
+| | |
+| --- | ---: |
+| Total sales | ₹87,880.00 |
+| Spares cost | ₹38,046.90 |
+| Gross margin | ₹49,833.10 — 56.7% of sales |
+| Expenses | ₹3,057.00 — 6.1% of gross margin |
+| **Net margin** | **₹46,776.10** — 53.2% of sales |
+| Opening → closing stock | ₹27,927.50 → ₹27,783.60 |
+| Cash drawer | ₹71,373.00 |
+| Bank (where UPI lands) | ₹18,750.00 |
 
 ## Requirements
 
@@ -65,6 +73,9 @@ Tulsi on 11 Sep), bank ₹500, payables ₹5,883 with Tulsi settled.
 | — | Edit a posted purchase | Done — three paths by risk; date amendable even on consumed stock |
 | — | Purchase register in date order | Done — screen, print and export |
 | — | Warranty terms on bill and WhatsApp | Done — owner-editable, printed only when the job carries warranty |
+| — | Monthly report, day by day | Done — every line of the margin chain visible |
+| — | Monthly summary, one-page A4 | Done — stock and cash reconciliations printed and tying |
+| — | Record profit taken out | Done — a drawing, below net profit, never an expense |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement
@@ -135,9 +146,11 @@ not a block:
 display paste carry a ₹1 cost, which is a placeholder rather than a purchase price.
 Any job using them reports near-total profit on a cost figure that is fiction.
 
-**1. Enable leaked-password protection** *(2 minutes, owner)*
-Supabase dashboard → project → Authentication → Sign In / Providers → Password →
-enable **Prevent use of leaked passwords**, set minimum length to 10.
+**1. Leaked-password protection needs a paid plan** *(not a toggle)*
+This was recorded here, and repeated to the owner for weeks, as a two-minute
+dashboard switch. It is not. Supabase's documentation states it is available on the
+Pro plan and above; on the free plan the switch is shown but greyed out. It cannot
+be turned on without upgrading.
 
 **2. Run one real job end to end on the published site** *(owner)* — still the most
 important item.
@@ -181,7 +194,16 @@ items were reported complete by the pass that built them and were not:
    billing, so seven jobs reached delivered with no bill, no ledger entry and no
    revenue. Three separate routes to that state existed; all three are now closed,
    one of them at the database where a later change cannot reopen it.
-7. Technician cost-gating, a second time. A full test pass found `purchases` and
+7. The dashboard had been failing to load, still asking for two job states the
+   four-step workflow removed. Job counts arrived by another route, so it looked
+   like it worked while "Cash collected today", the alerts, the month trend and top
+   technicians came through blank.
+8. Five bills printed more spares than they charged for, because hand-back listed
+   every spare ever issued including returned ones. A customer adding up their own
+   bill got a different number from the total.
+9. The day book had money in and out inverted, and also double-counted every
+   payment. Swapping the columns would have preserved the double count.
+10. Technician cost-gating, a second time. A full test pass found `purchases` and
    `purchase_items` readable by a technician; sweeping for the same class of hole
    found **ten more** leaking tables. Cost had been claimed here twice as gated at
    the database. It was not.

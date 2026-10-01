@@ -894,3 +894,201 @@ One optional refinement was raised and deliberately not applied: `பில் (
 Supply) தான்` places the bracket between the word and தான். It is common on bills and
 reads fine; `இந்த பில் தான் (Bill of Supply) Warranty ஆவணம்.` flows slightly better.
 Left as the owner wrote it, and he can change it in Settings.
+
+## Monthly reporting, and the mismatch the owner spotted
+
+The owner reported his totals were out by roughly ₹300 to ₹500 and asked for a
+monthly report. He did not say which two screens disagreed, so the instruction was
+to find it: build net profit from source vouchers, compare against every report and
+dashboard tile, and **report before fixing anything**.
+
+### The ₹500 was on his customers' bills
+
+Five bills printed more spares than they charged for. When a job was handed back,
+the bill listed **every spare ever issued to it, including ones that had been
+returned**:
+
+| Bill | Job | Lines add to | Total |
+| --- | --- | ---: | ---: |
+| INV/0002 | 0007 | ₹400 | ₹200 |
+| INV/0003 | 0008 | ₹200 | ₹100 |
+| INV/0005 | 0006 | ₹100 | ₹50 |
+| INV/0007 | 0003 | ₹300 | ₹150 |
+| INV/0004 | 0004 | ₹3,900 | ₹1,950 |
+
+The first four come to **exactly ₹500**, which is what he had noticed. Finding that
+is what turned a vague complaint into a located bug.
+
+This was never a reporting inconvenience. A customer adding up the lines on their
+own bill got a different number from the total they paid. The hand-back now lists
+only spares net of returns, and the five existing bills were corrected — totals
+unchanged, ledger unmoved, the old lines kept word for word in the audit log, and
+the phantom **₹2,450** cleared from the stored lines that some reports read.
+
+### Three more things that pass found
+
+**The Profit report's columns did not add up, by ₹200.** It silently deducted a
+discount it never displayed. The profit was right; the presentation was not.
+Discount is now its own column.
+
+**Reports counted on different dates.** The dashboard used bill date; Profit,
+Deliveries and the Job register used the date the phone came in. Over all of
+September both gave ₹87,880, but 17 September read ₹32,550 one way and ₹3,300 the
+other. The owner chose bill date everywhere for money. Reports that are genuinely
+operational keep the received date and now **say so on the screen** — the failure
+was never the choice of date, it was that neither screen said which it used.
+
+**Two reports used the same word for different things.** Job register "Service
+revenue" (₹87,880, the whole bill) and Profit report "Service charges" (₹18,900,
+labour only). Renamed to "Total billed" and "Labour charges", and three further
+collisions were found and fixed.
+
+### Monthly report
+
+Day by day plus a month total. The owner's formula was *Total Sales (Service Revenue
++ Spares Margin) − Cost spares − expenses*, which **double-subtracts the cost of
+spares**: if total sales already uses margin, the cost has been taken out once.
+Implemented instead with every line visible so the arithmetic can be audited:
+
+```
+Service revenue + Spares revenue − Discount = Total sales
+− Spares cost = Gross profit
+− Expenses    = Net profit
+```
+
+Spares margin appears as a derived column marked as already inside gross profit, so
+it can never be subtracted twice.
+
+September: total sales ₹87,880.00, spares cost ₹38,046.90, gross ₹49,833.10,
+expenses ₹3,057.00, **net ₹46,776.10**.
+
+## Monthly summary — a one-page A4
+
+Opening and closing stock and cash, the trading figures between them, each
+percentage labelled with its base.
+
+**The trap designed around:** the owner's layout puts Total Purchases directly above
+Gross Margin, and any reader will assume margin = sales − purchases. It is not —
+margin uses the cost of spares **issued**, purchases are what was **bought**. That
+is the same confusion that produced his mismatch, so purchases sits outside the
+margin chain, in the stock movement block, labelled as money spent on stock rather
+than cost of sales.
+
+**The page proves itself.** Opening stock ₹27,927.50 + purchases ₹37,903.00 −
+issued ₹38,046.90 ± nil = **₹27,783.60**, and the stock books agree. That figure was
+also cross-checked lot by lot, worked out independently. Cash likewise, per account.
+
+One page at real A4 — 243 mm of 277 mm usable. Checked in greyscale, not assumed:
+the first attempt had the stock and cash headings rendering as near-identical grey,
+so the cash heading was darkened and the sections given different borders so they
+stay distinct with no colour at all.
+
+## The cash figures, and a warning I gave that was wrong
+
+Building the summary turned up a cash double-count. Entering an opening balance on a
+money account writes it into the books as an opening entry — and two reports then
+added the same figure again on top.
+
+**I told the owner his dashboard had been overstating his cash by ₹53,949 every
+day, and that he might have made a buying decision on it. That was wrong.** The bad
+figure was being calculated behind the dashboard, but no dashboard tile displays a
+cash or bank balance at all. I passed on a bad formula as a bad number on his screen
+without checking the screen.
+
+A real fault was found in the same place: the dashboard **had been failing to load**,
+still asking for two job states the four-step workflow removed. Job counts arrived by
+another route, which is why it looked like it worked, while "Cash collected today",
+the alerts, the month trend and top technicians came through blank.
+
+### The day book was inverted, and swapping the columns would not have fixed it
+
+Money in and out were the wrong way round on drawer and bank lines. The cause was
+not a label: the day book read the drawer side **backwards** *and* also picked up the
+customer side of every payment, counting it twice. September showed ₹140,286 in and
+₹137,229 out, neither tying to anything. Flipping the labels would have preserved
+the double count.
+
+It now reads only the money-account side: in is money arriving, out is money leaving.
+
+### Three screens, one answer
+
+| September | Opening | In | Out | Closing |
+| --- | ---: | ---: | ---: | ---: |
+| Drawer — Cash & bank book | ₹53,949.00 | ₹69,480.00 | ₹52,056.00 | ₹71,373.00 |
+| Drawer — Day book | ₹53,949.00 | ₹69,480.00 | ₹52,056.00 | ₹71,373.00 |
+| Drawer — Monthly summary | ₹53,949.00 | ₹69,480.00 | ₹52,056.00 | ₹71,373.00 |
+| Bank — all three | ₹0.00 | ₹18,750.00 | ₹0.00 | ₹18,750.00 |
+
+An opening balance is not a receipt, so it is now counted as opening on all three
+rather than as money arriving on one. The edge cases were tested rather than
+assumed: a range starting **after** the opening entry brings forward ₹53,482 with
+nothing leaking in from the day before; a range before either account existed
+returns a real zero; an empty October carries the balances through rather than
+showing blank; and every row's running balance was checked to walk from the new
+opening to the closing without a break.
+
+## Stock counts locked down
+
+A security finding said a count line could be edited without the row being
+re-checked afterwards, so it could be moved onto another branch's count or one
+already closed.
+
+Sweeping 33 edit rules across 32 tables found the same shape **three more times**:
+the count header (a count could be closed by editing it, skipping the Close button
+and its stock posting), and purchase orders and purchase returns (a draft could be
+flipped to posted with no stock or ledger entry behind it).
+
+**A closed count is now final for everyone** — owner included, and a database admin
+is refused too. There is no reopen, by design: if a closed count was wrong, the fix
+is a new count or a stock adjustment, and either leaves its own record. Ordinary
+counting still works, proved by editing a line 10 → 7, adding a line, and closing a
+count with the Close button.
+
+Three gaps were found and deliberately left, recorded so they are known rather than
+forgotten: a posted payment's or expense's amount can be edited directly; a
+technician can hand a job to someone else (never take one); and a count's system
+quantity is typed by the screen rather than read from stock.
+
+**Leaked-password protection is a paid-plan feature.** It had been recorded here and
+repeated to the owner for weeks as a two-minute dashboard toggle. Supabase's
+documentation says otherwise: on the free plan the switch is shown but greyed out.
+
+## Profit taken out
+
+The owner draws profit monthly and wanted somewhere to record it.
+
+**It is a drawing, not an expense**, and that distinction mattered more than the
+feature. Booked as an expense, a month where he draws ₹40,000 would read as
+near-breakeven, and the books would understate the shop every month from then on.
+Profit is earned first; drawing happens out of profit already made.
+
+So on the Monthly summary it sits **below** net profit:
+
+```
+Net profit − Profit taken out = Profit retained in the business
+```
+
+with the cumulative retained figure alongside. Proved with a ₹40,000 test drawing,
+then rolled back: total sales, gross margin, expenses and net margin all **identical
+before and after**; only the drawer moved, ₹71,373 → ₹31,373.
+
+Each drawing gets its own voucher number, posts against Drawings (owner), and is
+cancellable but never deletable. It refuses a withdrawal that would take an account
+below zero — including a **backdated** one that would make any later day negative,
+which was claimed and then actually tested: a ₹30,000 drawing dated 01 September was
+refused because the drawer dipped to ₹6,293 on the 14th. It warns, without blocking,
+when the amount exceeds the month's profit, distinguishing a draw against earlier
+retained profit from one against money never earned.
+
+### What the technician sees
+
+Hiding drawings initially closed the Cash & bank book and the day book to
+technicians altogether. That contradicted the original requirement — technician sees
+everything except profit — so the owner was asked rather than it being settled by
+default. He chose to give the books back.
+
+The rule is now: **he can see the cash leaving, he cannot see what it means.** The
+books open, the drawing shows as a plain money-out line, the running balance is
+right. Refused by real call: the drawings list (no rows), drawing totals, recording,
+pre-checking, cancelling, the Monthly summary, the Monthly report, the profit report,
+and every cost column.
