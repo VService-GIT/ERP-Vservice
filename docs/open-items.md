@@ -10,6 +10,11 @@
   ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
   0048 are labour only (₹150 and ₹200).
 
+- **Open Hand back and check the date box, and open a delivered job and check the
+  owner's "Change delivery date" button.** Both were built and the logic behind them
+  tested against live data, but neither has been seen on screen — no signed-in
+  session can be created from the build environment.
+
 - **Open Settings → Profit taken out and enter an amount larger than the month's
   profit.** The over-profit warning was tested at the database but has never been
   seen on screen.
@@ -76,6 +81,11 @@ stock count's system quantity is typed by the screen rather than read from stock
 The older finance report still opens for a technician. Its profit and cost figures
 come back blank, but it shows total sales and total expenses. This predates the
 drawings work and was left alone pending the owner's view.
+
+**A moved delivery date shows in the old month as money out on the original date**,
+rather than that month's receipts shrinking — and the month it left can show spares
+issued in one month but billed in the next. Both are accurate records of what
+happened, and both follow the same two-line pattern as every cancellation.
 
 **A cancelled drawing stays visible as two lines** — money out, then the reversal
 in, on the same date. That month's in and out totals both include it while the

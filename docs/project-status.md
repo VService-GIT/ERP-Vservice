@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 1 October 2026**
+**As at 5 October 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `8638ca1`
+- Head commit: `1328f3f`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -28,16 +28,19 @@ The stock figure moved twice before it settled. It was quoted as 1,599 units /
 ₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
 confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
-## The shop as it stands, 1 October
+## The shop as it stands, 5 October
 
 | | |
 | --- | --- |
-| Job sheets | 120 |
-| Bills raised | 100 |
-| Purchases | 67 |
-| Parties | 139 |
-| Expenses | 22 |
-| Ledger entries | 615 — Dr ₹333,978.00 / Cr ₹329,128.00 |
+| Job sheets | 134 |
+| Bills raised | 120 |
+| Ledger entries | 729 |
+| Stock movements | 300 |
+| Audit rows | 4,134 |
+
+The shop is in daily use and the figures move constantly; the numbers above are a
+snapshot from the last verification pass, not a position statement. September's
+closed month is below.
 
 **September, from the Monthly summary** — stock and both cash accounts tie to the
 paisa:
@@ -47,11 +50,13 @@ paisa:
 | Total sales | ₹87,880.00 |
 | Spares cost | ₹38,046.90 |
 | Gross margin | ₹49,833.10 — 56.7% of sales |
-| Expenses | ₹3,057.00 — 6.1% of gross margin |
 | **Net margin** | **₹46,776.10** — 53.2% of sales |
 | Opening → closing stock | ₹27,927.50 → ₹27,783.60 |
 | Cash drawer | ₹71,373.00 |
 | Bank (where UPI lands) | ₹18,750.00 |
+
+Expenses have since grown to 24 entries / ₹20,557 as the shop keeps recording, so
+September's net will read differently from the figure above on a live screen.
 
 ## Requirements
 
@@ -76,6 +81,8 @@ paisa:
 | — | Monthly report, day by day | Done — every line of the margin chain visible |
 | — | Monthly summary, one-page A4 | Done — stock and cash reconciliations printed and tying |
 | — | Record profit taken out | Done — a drawing, below net profit, never an expense |
+| — | Choose the delivery date at hand back | Done — defaults to today |
+| — | Correct a delivered job's date | Done — owner only; bill, ledger and payment move together |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement

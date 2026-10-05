@@ -1092,3 +1092,80 @@ books open, the drawing shows as a plain money-out line, the running balance is
 right. Refused by real call: the drawings list (no rows), drawing totals, recording,
 pre-checking, cancelling, the Monthly summary, the Monthly report, the profit report,
 and every cost column.
+
+## The delivery date — settable at hand back, correctable afterwards
+
+The owner sometimes hands a device back and records it later. Two changes: a date
+picker on Hand back, defaulting to today, and an owner-only correction on a job
+already delivered.
+
+The second is a financial amendment, not a field edit. Every money report now runs
+on bill date, so moving a delivery date moves revenue between days and between
+months.
+
+### It reused the purchase machinery, with two departures worth recording
+
+Reused as-is: the same bill number, a revision counter, a reason, an audit row
+holding before and after, and the date-aware reversal that lands both legs on the
+original day rather than stamping `current_date`.
+
+**The advance.** Reversing the whole job record would have dragged the customer's
+advance along with the bill, because both sit on the same record. The reversal now
+takes a bill number and moves only that bill's lines, so **an advance keeps the date
+it was actually received**. Not something that had been anticipated when the
+instruction was written.
+
+**The bill.** Purchases cancel and re-post. That cannot work here: one job can only
+ever have one bill, so the re-post would be refused by a rule built earlier in this
+project. The date is corrected in place instead, with the old copy in the audit row
+and the revision counter incremented — the same way purchase details are corrected.
+
+**The payment takes the bill's date**, on the bill and in the cash book, so it moves
+with it and the customer balance and day book stay in step.
+
+### Proved by moving a real job across a month boundary
+
+JOB/0110, INV/0096, ₹1,700 cash, 29 September → 1 October, then rolled back:
+
+| | Before | After |
+| --- | --- | --- |
+| September — sales / spares cost / net | ₹87,880 / ₹38,046.90 / ₹29,276.10 | ₹86,180 / ₹37,488.90 / ₹28,134.10 |
+| October — sales / spares cost / net | ₹32,550 / ₹15,155 / ₹17,395 | ₹34,250 / ₹15,713 / ₹18,537 |
+
+The Monthly summary matched the Monthly report on both months, before and after.
+
+The three cash screens still agreed: September's drawer closed at ₹69,673, 29
+September closed at ₹69,523, and 1 October opened at ₹69,673, took ₹1,700 and closed
+at ₹71,373 — chaining exactly into the Cash & bank book.
+
+**A point about proving a ledger in an append-only book.** Debits and credits both
+rose by ₹6,800, so the raw totals did change. They must: the reversal and the
+re-post are new rows. What has to hold is the **gap** between them, and it stayed at
+₹4,850. A test that demanded unchanged totals here would have been testing the wrong
+thing.
+
+### The refusals, each tried for real
+
+> "Combo (LCD) – Oppo A17 was issued to JOB/2026-27/0086 on 03 Oct 2026. The job
+> cannot be handed back before that, on 30 Sep 2026."
+
+> "Current Account would hold ₹-350.00 on 30 Sep 2026 if this bill's ₹1,600.00
+> collection moved to 01 Oct 2026…"
+
+Plus: future date; before the job was received; across the financial year; no reason
+given; the same date as now; a later payment against the bill dated before the new
+date; and a closed day. The cash check tests **every day in between**, not only the
+target date — the same shape as the backdated drawing check.
+
+**Access:** a technician can set the date at hand back, since that is only recording
+when he handed the device over. Moving a posted bill afterwards is refused — *"Only
+the owner can change the date of a delivered job."* Both proved by real call.
+
+### Two consequences that are correct, not faults
+
+A move shows in the old month as money **out** on the original date rather than that
+month's receipts shrinking — the same two-line pattern already agreed for
+cancellations.
+
+After a move, the September summary shows ₹558 of spares **issued in September but
+billed in October**. That is what actually happened.
