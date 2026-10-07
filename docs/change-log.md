@@ -1322,3 +1322,39 @@ This is the fifth gap of the same shape. The pattern is consistent enough to sta
 ## SVS Mobiles, ₹38,270 to ₹37,650
 
 Noticed and left untraced in one round, traced in the next rather than written off as "probably real shop activity": PB/2026-27/0061 amended from ₹1,600 to ₹750 at 10:28, and PB/2026-27/0091 entered at ₹230 at 10:43. ₹38,270 − ₹850 + ₹230 = ₹37,650. Both real.
+
+## The cancelled part that came back on the wrong day
+
+The owner tried to move JOB/2026-27/0160 from 7 October to 30 September and was refused: "would leave -1.000 in stock on 30 Sep 2026. Check the purchase date of this part."
+
+I guessed the purchase date was wrong — the familiar story of a part taken in September and billed in October. **That guess was wrong, and the agent disproved it rather than confirming it.** There is one purchase, PB/2026-27/0061, bill dated 23 Sep, supplier bill number 23092026, keyed in on 28 Sep. Nothing about it needed changing.
+
+What it found instead: **when a job is cancelled, the money is reversed on the bill's own date, but the spare goes back into stock dated today.** One repair for Masilamani had been booked three times — fitted 28 Sep and paid ₹1,600, cancelled this morning to correct a rate, re-billed as JOB/0159, cancelled as a duplicate, re-billed as JOB/0160. The cancellation returned the money to 28 September and the part to 7 October, so for nine days the books showed the part consumed with no sale behind it. Stock on 30 September read 0. The guard was right about the books; the books were wrong about the shop.
+
+**This was the remainder of my own mistake.** I took the position that cancellation reversals could sit on today's date, we found out it was wrong when ₹1,600 of September purchases landed in October, and I fixed it for purchases only. Job parts were the same rule in a second place. The pattern is worth stating: when a dating rule is wrong once, the fix has to be chased everywhere the rule applies, not only where it was caught. The agent took that on itself for future work without being asked to.
+
+**Fixed** at the cancel path, plus an outside-repair charge reversal and an unused older reversal tool that had the same default. Two late returns were re-dated by reverse-and-repost, nothing deleted: JOB/0085 from 7 Oct to 28 Sep, JOB/0031 from 17 Sep to 16 Sep.
+
+**Deliberately still on today's date,** because each is a real event on the day it happens: handing back an unused part, logging a customer's faulty part, sending or receiving an outside repair, receiving a stock transfer, and a bounced cheque.
+
+September closing stock ₹28,709.60 → ₹30,309.60, being the unit that was genuinely on the shelf. The "issued but not billed" mismatch went from ₹1,600 in September and −₹1,600 in October to **₹0 in both**. Purchases, profit and the Books check gap did not move. No spare is negative on any day from 1 April to today.
+
+Proved by running the owner's real action and undoing it, not by reasoning: JOB/0160 to 28 Sep allowed, JOB/0064 to 10 Sep allowed, and as a control JOB/0003 to 1 Sep still correctly refused.
+
+**The list, built so the owner meets this once rather than one dialog at a time:** 18 delivered jobs cannot move all the way back to their booking date, each with the earliest date it can legally take. Most are legitimate — the part was not there yet, or earlier units had gone to other jobs.
+
+## Correcting how a bill was paid
+
+Asked for after the sales bill became editable: a bill is sometimes keyed as cash when the customer paid by UPI. The total is right and the money is in the wrong place.
+
+Cash, UPI, a split of the two, and the amount received — which covers fully paid, part paid and not paid. The amount was included deliberately rather than split into a second feature: a mis-keyed payment is nearly always wrong method *or* wrong amount, and separating them would mean editing the same bill twice.
+
+**Only the leg that changes is reversed and re-posted, on the bill's own date.** In a split bill where only the UPI part moves, the cash part is untouched. **Advances are left completely alone** — an advance carries its own receipt number and date, and only entries carrying the bill's number are touched.
+
+Four directions proved on real bills inside tests that were then removed. INV/0067, 21 Sep, cash → UPI ₹500: day book cash out 80 → 580 and UPI in 300 → 800; drawer closing 65,643 → 65,143 and bank 17,750 → 18,250; September month-wise 87,580 / 34,500 → 87,080 / 35,000; monthly summary closing 88,423 / 12,640 → 87,923 / 13,140. Sales and net profit did not move, which is the point. INV/0132, paid → unpaid, left the customer owing ₹1,200 and the ledger showed it.
+
+Refusals proved by real calls, not by reading the code: cancelled bill, overpayment, card payment, missing reason. A technician was refused at the database on the amend action, on the inner steps called directly, on the change log, and on writing to the payment records — four ways in, all closed, because a hidden button is not a permission.
+
+Row counts identical before and after on all four tables: no residue.
+
+**Not checked:** the screen itself, the printed bill, the WhatsApp message and the report downloads. All of them need a signed-in owner view, which this project still cannot produce.

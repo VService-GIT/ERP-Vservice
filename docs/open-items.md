@@ -91,6 +91,19 @@
 
 ## Approved, not yet built
 
+- **Decide which items are services, not stock.** Five items are set up as stocked
+  spares when they are really work: General service and General service - Samsung A35
+  (₹1 placeholder units, no real cost), and Rework service Charge, Software - Apple 6s
+  and Software - Samsung M01 core (bought in from outside, ₹2,100 in total). Converting
+  all five drops stock value by ₹2 and removes JOB/0116 from the blocked-jobs list.
+  **Recommended: convert the two General service placeholders only.** The other three
+  carry a real bought-in cost that today correctly reaches the job's margin; as plain
+  services that cost would stop reaching it and profit would read ₹2,100 higher unless
+  it were booked as an expense instead. The one thing it costs to leave them as stock
+  is that JOB/0116 cannot be billed before 3 October — which is correct, since that is
+  the day the rework was bought.
+
+
 - **Decide the date on PB/2026-27/0053.** One Itel battery, ₹600 from SVS Mobiles,
   dated 12 Jul 2026 — before the 1 September opening balances. Keyed in on 21 Sep and
   fitted to JOB/0082 the same day. Its ₹600 currently sits on top of opening stock,
