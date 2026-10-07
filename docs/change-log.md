@@ -1169,3 +1169,102 @@ cancellations.
 
 After a move, the September summary shows ₹558 of spares **issued in September but
 billed in October**. That is what actually happened.
+
+## The spare-issue date, and a guard that blocked real work
+
+The delivery-date refusal — "the job cannot be handed back before the spares were issued to it" — stopped the owner working. His actual flow is to create the job, issue the spare and hand back all on one day in the system, then correct the delivery date back to when he really handed the phone over. The spare's issue date was still today, now *after* the delivery date, so the guard refused.
+
+That issue date was never real. It was when he typed it in, not when the part went into the phone.
+
+**Spare issue dates now follow the delivery date — by clamping, not by reassigning.** A part genuinely issued on the 20th for a phone delivered on the 25th keeps the 20th, because that is real history. Only a date that would fall *after* the delivery is pulled back to it. Proved on job 0005: two spares moved from 5 Oct to 28 Sept (2 moved, 0 kept), then moving the same job forward to 29 Sept left both on the 28th (0 moved, 2 kept).
+
+One refusal had to survive, and did:
+
+> "Combo (LCD) – Motorola G34 fitted on JOB/2026-27/0005 arrived in the shop on 28 Sep 2026 (PB/2026-27/0073). It cannot have gone into the phone on 27 Sep 2026. If the purchase date is wrong, correct the purchase first."
+
+**It also fixed the cost-matching problem** recorded in the previous section: spares issued but not billed now reads ₹0 in both months, because cost lands in the month of the revenue it earned. Stock ties with a ₹0 difference in September and October, and no item goes below zero on any day.
+
+## Advances that never reached the drawer
+
+At intake the system wrote only "customer paid ₹X". The balancing step then invented a matching line against a placeholder called **"Job work"** — so the voucher balanced, every check passed, and the cash never arrived anywhere. A balanced voucher pointing at a placeholder is invisible to every test we had.
+
+Two jobs were affected: JOB/0066 ₹500 and JOB/0106 ₹200. The owner confirmed he physically took the money, so his drawer was reading **₹700 light**.
+
+| Job | Drawer, job date | Drawer, delivery date | Total | Customer |
+| --- | --- | --- | --- | --- |
+| 0066 | ₹500 on 18 Sep | ₹500 on 21 Sep | ₹1,000 | ₹0 → ₹0 |
+| 0106 | ₹200 on 29 Sep | ₹400 on 29 Sep | ₹600 | ₹0 → ₹0 |
+
+The double-count risk flagged beforehand did not materialise: hand back had already credited each customer with only the balance due, so both were at zero before and after. Cash Drawer ₹89,123 → ₹89,823, bank unchanged, both amounts landing in September.
+
+Intake now has an **"Advance received into"** account, defaulting to Cash Drawer.
+
+## The books did not balance, twice
+
+### ₹4,850 — the opening capital that was never written
+
+Total debits and credits differed by ₹4,850. The first explanation offered — that handing back an unpaid bill widened it — was wrong, and the agent corrected itself: its test had rolled back *before* the deferred balancing step ran, producing a false ₹1,300. All 344 numbered vouchers balanced to the paisa.
+
+The whole gap was the 1 September opening balances, posted **without a voucher number**. The balancing step only runs on numbered vouchers, so the owner's-capital side was never written. Nothing the owner could see was affected; the missing line was capital, which no screen shows.
+
+**The reconciliation report said clean** because it grouped by voucher and ignored unnumbered rows — blind to exactly the rows that were wrong. It now also checks total debits = total credits including unnumbered rows, and would have caught this.
+
+### ₹2,850 — and an explanation worth rejecting
+
+A second gap appeared. The agent proposed that the capital figure had been "entered ₹2,850 short" and asked the owner what his opening capital should be.
+
+That was refused, because **₹2,850 is exactly SVS Mobiles' opening balance** — the supplier openings were ₹49,099, Tulsi ₹46,249 plus SVS ₹2,850, and ₹49,099 is what the capital line was derived from. Too precise to be coincidence. Three possibilities were put in order, cheapest first: is the check miscounting, was a row removed, or did the re-dating run touch an opening row.
+
+The answer was none of them. **A row had been added.** On 6 October the owner zeroed SVS's opening balance, which correctly posted a ₹2,850 correction against SVS and left the capital line stale. He confirmed the zeroing was deliberate, so capital was the figure that needed correcting.
+
+The lesson is the method, not the number: asking for the cheapest explanation to be ruled out first is what made the rest of the answer trustworthy, and it stopped the owner being asked to invent a capital figure he had no way of knowing.
+
+**The real defect behind it:** changing a party's opening balance posted the party side and left capital behind. It now posts both in the same transaction, and the sweep found the same hole on money accounts — unhit only because the Cash Drawer's capital line happened to have been posted by hand.
+
+Opening position now reads end to end: SVS ₹0, Tulsi ₹46,249, cash ₹53,949, capital ₹7,700, debits ₹56,799 = credits ₹56,799.
+
+## Cancelled purchases, and a decision reversed
+
+The owner reported cancelled purchases showing in his figures. The audit found **nothing counted twice** — all four were cancelled with full reversals and SVS's closing balance was correct at ₹38,270.
+
+What made it look wrong: each reversal landed on the day of cancellation, not the bill's date. Between 1 and 8 September the running balance genuinely carried a cancelled ₹600.
+
+**But there was a real fault underneath, and it was a decision recorded earlier in this document.** When the date-aware reversal was built for amendments, the question of applying it to cancellations was raised and answered: leave it, because a cancellation genuinely happens on the day it is done. That reasoning holds for a day book and fails for a monthly report. Two September bills cancelled in October — PB/0081 ₹700 and PB/0058 ₹900 — put **₹1,600 of September purchases and closing stock into the wrong month**.
+
+Cancelling now reverses on the document's own date, the existing mis-dated cancellations were re-dated with 32 correcting money entries and 14 stock entries, and the earlier decision is withdrawn.
+
+## Books check
+
+A page under Reports, owner only, that runs every integrity check and explains in plain words what a non-zero figure means. It found the ₹4,850 and then the ₹2,850, each within days of occurring. Both would otherwise have surfaced at year end, when nobody can remember what happened.
+
+Three additions, all built:
+
+- **The opening entries, listed with their totals.** They carry no voucher number and no other screen can see them, which is exactly why two imbalances hid there.
+- **The gap and its cause on the dashboard** — silent when there is nothing wrong, because a tile that is always present teaches people to ignore it. It names the cause ("opening entries out by ₹2,850") rather than only the amount, since a number alone sends the owner to ask rather than to look.
+- **A log of every opening-balance change** — who, when, old figure, new figure. This turns "why don't my books balance" into "Satheesh changed SVS Mobiles on 6 October".
+
+Each was proved twice: reading correctly with the books balanced, and reading correctly with the balance deliberately broken inside a rolled-back test. A diagnostic that is itself wrong costs more than the fault it was meant to catch.
+
+Recorded honestly: the "cause not identified" branch has **never fired in a test**. Every entry falls into one of three named groups, so it should not appear. It is a safeguard, not a tested path — and if it ever shows, that in itself means something unexpected exists.
+
+## Reporting and exports
+
+**Day-wise / month-wise** on the Monthly report rather than a separate screen. Built as a toggle deliberately: a second report computing the same figures its own way is how two screens come to disagree, which is the fault that took a day to find. The month row is the sum of the day rows, so they cannot drift.
+
+The owner's column list — Date, Total Sales, Total Expenses, Net Profit, Cash, UPI — had no spares cost in it. Computed as sales minus expenses, September would have read ₹84,823 against a real net of ₹46,776. A spares cost column was added so the row adds up left to right, rather than deducting ₹38,046 invisibly.
+
+**Cash and UPI are collections, not sales**, and the page says so: a credit sale, an advance or a payment against an older bill all break the equality, and every one is legitimate.
+
+**CSV and PDF on every stock tab**, plus a **"Hide items with no stock"** toggle defaulting on — 98 of 188 spares are empty. The file states what it is showing: "90 items with stock (98 with no stock hidden)". An export that silently differs from the screen is worse than no export, so the toggle drives both.
+
+It also found and fixed CSV amounts exporting as text (`"₹1,234.00"`) rather than numbers, so Excel can sum them.
+
+## Duplication audit
+
+Asked for after a run of date moves, each writing a reversal and a repost. Worth noting that **the books balancing is not evidence against duplication** — a duplicated pair balances perfectly — so the check was for specific shapes.
+
+Nothing is double-counted: 812 ledger lines with 60 reversals and 328 stock movements with 19 reversals all reconciled, with no orphaned reversals, nothing reversed twice, and no identical rows. Batch quantities match stock movements; each bill's party amount equals its total exactly once.
+
+Found and left for the owner's decision: **11 spare parts existing as 23 records**, and **3 genuine duplicate customers** (identical name and phone, all at ₹0). No duplicate suppliers — the 39 purchases sharing a "bill number" were run down item by item and are separate purchases on the same day, the numbers being dates like `14092026`.
+
+The zero-stock toggle incidentally tidies the duplicates: three parts hold stock in a single record and show once; the other eight are empty and vanish.

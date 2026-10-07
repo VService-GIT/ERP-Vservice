@@ -10,6 +10,24 @@
   ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
   0048 are labour only (₹150 and ₹200).
 
+- **Create two logins and add four secrets.** This is the item that unblocks the
+  others: a dedicated owner-level test account and the technician account still
+  outstanding, with their credentials in Project Settings → Secrets as
+  `TEST_USER` / `TEST_PASS` and `TEST_TECH_USER` / `TEST_TECH_PASS`. Six features
+  now have proven logic and unverified screens, and the export cost-gating has
+  been simulated rather than exercised by a real button press.
+
+- **Raise a supplier price-adjustment note for ₹100** — two batteries went in at
+  ₹600 against a real ₹650. The stock is consumed, so amending the purchase would
+  restate the margin on three closed, paid jobs; an adjustment note corrects what
+  is owed to SVS without touching them.
+
+- **Decide on the duplicates.** 11 spare parts exist as 23 records and 3 customers
+  are genuine duplicates (same name and phone, all at ₹0). Nothing is
+  double-counted and no total is wrong; merging the spares would make the
+  low-stock warnings work properly. Neither should be merged on an agent's
+  judgement.
+
 - **Open Hand back and check the date box, and open a delivered job and check the
   owner's "Change delivery date" button.** Both were built and the logic behind them
   tested against live data, but neither has been seen on screen — no signed-in
@@ -70,6 +88,17 @@
 
 - **Check the reconciliation report once.** Its four problem counts can only be read
   from a signed-in screen. Every figure feeding it is clean.
+
+## Approved, not yet built
+
+**Editing a posted sales bill in place** — same number, with a revision count,
+reversal and repost, exactly as purchases work. Chosen over cancel-and-rebill so a
+customer's copy keeps its number. Three things it must handle: changing an item
+means changing what was issued to the job, so FIFO cost and stock move with it; a
+new total below what has already been collected leaves the customer in credit and
+must be refused rather than silently allowed; and the bill is now the warranty
+document, so an amended bill disagrees with the copy already printed and shared and
+needs re-sharing.
 
 ## Known and deliberately left
 

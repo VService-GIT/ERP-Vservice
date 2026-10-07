@@ -1,10 +1,10 @@
 # Project Status — Mobile Service Centre ERP
 
-**As at 5 October 2026**
+**As at 7 October 2026**
 
 - Live: https://vservice-mobile-service-erp.lovable.app
 - Editor: https://lovable.dev/projects/f5ee7928-9a2f-4d9a-aafd-8dc467142a1f
-- Head commit: `1328f3f`
+- Head commit: `187ba92`
 
 **Overall: loaded with the shop's real opening position and ready for a supervised
 first week.** Every stated requirement is met, the security holes are closed, and
@@ -28,35 +28,22 @@ The stock figure moved twice before it settled. It was quoted as 1,599 units /
 ₹27,327.50, then 1,606 / ₹29,457.50; a full reconciliation of all 99 items
 confirmed **1,604 units / ₹29,357.50** with no discrepancies.
 
-## The shop as it stands, 5 October
+## The shop as it stands, 7 October
 
-| | |
-| --- | --- |
-| Job sheets | 134 |
-| Bills raised | 120 |
-| Ledger entries | 729 |
-| Stock movements | 300 |
-| Audit rows | 4,134 |
+In daily use; the figures move constantly. From the last verification pass: 1,046
+ledger entries, 418 stock movements, 190 item records, 92 purchases.
 
-The shop is in daily use and the figures move constantly; the numbers above are a
-snapshot from the last verification pass, not a position statement. September's
-closed month is below.
-
-**September, from the Monthly summary** — stock and both cash accounts tie to the
-paisa:
+**The opening position, now balanced end to end:**
 
 | | |
 | --- | ---: |
-| Total sales | ₹87,880.00 |
-| Spares cost | ₹38,046.90 |
-| Gross margin | ₹49,833.10 — 56.7% of sales |
-| **Net margin** | **₹46,776.10** — 53.2% of sales |
-| Opening → closing stock | ₹27,927.50 → ₹27,783.60 |
-| Cash drawer | ₹71,373.00 |
-| Bank (where UPI lands) | ₹18,750.00 |
+| Cash Drawer opening | ₹53,949 |
+| Tulsi Mobile & Electronics | ₹46,249 |
+| SVS Mobiles | ₹0 — zeroed by the owner on 6 Oct |
+| Owner's capital | ₹7,700 |
+| | debits ₹56,799 = credits ₹56,799 |
 
-Expenses have since grown to 24 entries / ₹20,557 as the shop keeps recording, so
-September's net will read differently from the figure above on a live screen.
+Books check whole-ledger gap: **₹0.00**.
 
 ## Requirements
 
@@ -83,6 +70,11 @@ September's net will read differently from the figure above on a live screen.
 | — | Record profit taken out | Done — a drawing, below net profit, never an expense |
 | — | Choose the delivery date at hand back | Done — defaults to today |
 | — | Correct a delivered job's date | Done — owner only; bill, ledger and payment move together |
+| — | Spare issue dates follow the delivery date | Done — clamped, so genuine earlier dates survive |
+| — | Day-wise / month-wise view | Done — a toggle on the Monthly report, not a second report |
+| — | Stock report CSV / PDF, zero-stock filter | Done — file always matches the screen |
+| — | Record profit taken out | Done — a drawing, below net profit, never an expense |
+| — | Books check page | Done — owner only; found two imbalances within days |
 | — | Bill of Supply after delivery | Done — customer, device, spares, labour, received and delivered dates |
 
 ## Added beyond the requirement
@@ -210,7 +202,19 @@ items were reported complete by the pass that built them and were not:
    bill got a different number from the total.
 9. The day book had money in and out inverted, and also double-counted every
    payment. Swapping the columns would have preserved the double count.
-10. Technician cost-gating, a second time. A full test pass found `purchases` and
+10. Advances never reached the drawer. Intake credited the customer and the
+    balancing step pointed the other side at a placeholder called "Job work", so
+    the voucher balanced, every check passed, and ₹700 of real cash existed
+    nowhere. A balanced voucher aimed at a placeholder is invisible to every test
+    we had.
+11. The books did not balance, twice — ₹4,850 of opening capital never written,
+    then ₹2,850 left stale when an opening balance was corrected. Neither affected
+    a figure the owner could see, and neither would have surfaced before year end
+    without the Books check.
+12. Cancelling a purchase reversed on today's date, putting ₹1,600 of September
+    purchases and closing stock into October. This was a decision recorded in this
+    documentation and later withdrawn — see the change log.
+13. Technician cost-gating, a second time. A full test pass found `purchases` and
    `purchase_items` readable by a technician; sweeping for the same class of hole
    found **ten more** leaking tables. Cost had been claimed here twice as gated at
    the database. It was not.
