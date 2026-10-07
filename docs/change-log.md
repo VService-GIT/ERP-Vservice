@@ -1268,3 +1268,23 @@ Nothing is double-counted: 812 ledger lines with 60 reversals and 328 stock move
 Found and left for the owner's decision: **11 spare parts existing as 23 records**, and **3 genuine duplicate customers** (identical name and phone, all at ₹0). No duplicate suppliers — the 39 purchases sharing a "bill number" were run down item by item and are separate purchases on the same day, the numbers being dates like `14092026`.
 
 The zero-stock toggle incidentally tidies the duplicates: three parts hold stock in a single record and show once; the other eight are empty and vanish.
+
+## Editing a posted bill
+
+The owner asked whether invoices could be edited — purchase and sales alike — covering date, amount and items. Purchases already could. Sales could not.
+
+Both now amend **in place, keeping the same number**, which was the owner's explicit choice over cancel-and-reissue. A bill number that a customer is holding should not change because a quantity was wrong. Each amendment bumps a revision counter and leaves its reversal and repost in the ledger, so the number stays stable while the history stays honest.
+
+On a sales bill the editable surface is quantities, rates, adding and removing spares, service charges and the discount. Stock follows the edit — a removed spare goes back, an added one comes out, FIFO batches reconsumed in order — and the party ledger, the day book and both cash screens restate against the bill's own date, not today's.
+
+**Payment method is not editable.** It was offered and not taken up. Worth saying why it is not a cosmetic field: switching a bill from cash to UPI moves money between the drawer and the bank, so the day's cash count stops matching the books until someone recounts. It needs its own posting, not a dropdown.
+
+## Where did this part come from
+
+The owner opened Movement history on a Vivo Y20 combo and asked the plainest possible question: where was this bought. The screen could not answer it. It showed four rows with types and dates and no document behind any of them.
+
+Every row now names its source: a purchase gives the PB number, the supplier and the supplier's own bill number; an issue gives the job number and the customer; opening stock says "on hand when the books started"; adjustments, transfers and returns each carry their own label. The job number opens the job. The purchase number opens the bill **only for someone allowed to see costs** — a technician gets the text, not the link. CSV and PDF gained Supplier/customer and Detail columns.
+
+The four rows resolved to one purchase on 1 September and one issue, re-dated from 6 October to 30 September by the spare-issue clamp. Correct, and now legible as such.
+
+Checked: the labels on screen, and a technician seeing the supplier with the rate column blank on every row while the owner saw ₹600. Not checked at the time of writing: the click-throughs, the new download columns, and the labels for reversed purchases, returns, adjustments, transfers and opening stock, none of which had been rendered against real data.

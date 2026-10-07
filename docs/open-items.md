@@ -297,6 +297,30 @@ a test is not cleaning up: it leaves two rows where there should be none. Tests
 against a live database must be removed completely, or the inability to remove them
 stated plainly rather than left for the owner to discover.
 
+## The 360-degree rule
+
+The owner's standing instruction, 7 October: **anything raised gets chased end to
+end, not patched where it was spotted.** A fault noticed on one screen is a fault
+in a chain, and the chain is what gets checked:
+
+- where the data is stored, and whether the stored shape is right
+- every screen that reads it
+- every report and every total that includes it
+- the ledger entries sitting behind it
+- the printed output and every CSV and PDF download
+- what a technician sees, not only what the owner sees
+
+The rule exists because of a repeated pattern in this work: a correct local fix
+that left the same fault alive one screen over. Cancelled purchases were taken out
+of the Monthly Summary and were still sitting in the party ledger. The bill-line
+fault was fixed on screen before the printed bill was looked at. The cost gate was
+closed on one table and three more of the same shape were found only when someone
+went looking.
+
+It applies to diagnosis as much as to repair. A claim that something works is only
+as good as the run that proved it, and the list of what was built but never
+exercised is a debt to be paid down, not a disclaimer to be reprinted.
+
 ## Known issues
 
 - **Report performance at volume.** Benchmarking showed `report_inventory` at
