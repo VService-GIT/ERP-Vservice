@@ -91,16 +91,41 @@
 
 ## Approved, not yet built
 
-**Editing a posted sales bill in place** — same number, with a revision count,
-reversal and repost, exactly as purchases work. Chosen over cancel-and-rebill so a
-customer's copy keeps its number. Three things it must handle: changing an item
-means changing what was issued to the job, so FIFO cost and stock move with it; a
-new total below what has already been collected leaves the customer in credit and
-must be refused rather than silently allowed; and the bill is now the warranty
-document, so an amended bill disagrees with the copy already printed and shared and
-needs re-sharing.
+- **Decide the date on PB/2026-27/0053.** One Itel battery, ₹600 from SVS Mobiles,
+  dated 12 Jul 2026 — before the 1 September opening balances. Keyed in on 21 Sep and
+  fitted to JOB/0082 the same day. Its ₹600 currently sits on top of opening stock,
+  shows in SVS's pre-September balance, and falls in neither month's purchases.
+  **Recommended: re-date it to the date on the paper supplier bill**, which must not
+  be after 21 Sep since the battery cannot be fitted before it arrived; 21 Sep if the
+  paper is unclear. What moves: SVS owed before 1 Sep ₹600 → ₹0, September opening
+  stock ₹27,927.50 → ₹27,327.50, September purchases ₹58,701 → ₹59,301. Closing stock,
+  profit and JOB/0082's ₹800 margin all unchanged. This waits on the owner because it
+  turns on a fact only he can read off the paper bill.
+
+- **Match receipt RCP/2026-27/0002 to bill INV/2026-27/0130.** Prakash paid ₹150 on
+  30 September through a receipt that was never tied to the bill. The books are now
+  right either way, but his bill screen still reads "Balance ₹150".
+
+
+- **Supplier price-adjustment note for ₹100.** Two batteries went in at ₹600 against
+  a real ₹650 on PB/2026-27/0057. The stock is consumed, so amending the purchase
+  would restate the margin on three closed, paid jobs; an adjustment note corrects
+  what is owed to SVS without touching them. Approved by the owner, not yet built.
+
+*(Editing a posted sales bill in place is now built — see the change log. The
+warranty point it raised still stands: an amended bill disagrees with the copy
+already printed and shared, and needs re-sharing.)*
 
 ## Known and deliberately left
+
+- **Technicians keep supplier ledgers, including amounts.** A technician can open
+  supplier ledgers and see what each supplier has billed and what is owed — SVS
+  Mobiles ₹48,900 billed, ₹37,650 owed — along with raw ledger amounts that include
+  purchase bill totals. This was put to the owner with the option of closing it or
+  blanking the figures, and he chose to leave it open. Recorded here so it is not
+  later "fixed" as an oversight: it is a decision, and the consequence is that a
+  technician can work out what the shop pays its suppliers.
+
 
 Three access gaps found during the stock-count sweep, recorded so they are known
 rather than rediscovered: a posted payment's or expense's amount can be edited

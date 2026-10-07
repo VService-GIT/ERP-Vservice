@@ -1288,3 +1288,37 @@ Every row now names its source: a purchase gives the PB number, the supplier and
 The four rows resolved to one purchase on 1 September and one issue, re-dated from 6 October to 30 September by the spare-issue clamp. Correct, and now legible as such.
 
 Checked: the labels on screen, and a technician seeing the supplier with the rate column blank on every row while the owner saw ₹600. Not checked at the time of writing: the click-throughs, the new download columns, and the labels for reversed purchases, returns, adjustments, transfers and opening stock, none of which had been rendered against real data.
+
+## The profit figure, and where it was actually wrong
+
+The hide-cancelled sweep was sent to look at cancellations. Walking every screen under the 360 rule, it found something unrelated and worse: the Finance profit-and-loss was reading spares cost as **₹0**, showing September net profit of **₹105,073** against a real **₹48,754.10**.
+
+**Root cause, not a patched number.** Three places worked profit out from the cost recorded on each bill line. Job bill lines never carry a cost — all 267 lines since the first bill on 11 September record ₹0. The real cost sits on the job's issued parts, which is where the monthly report had always read it. One shared spares-cost rule now feeds every profit figure, the monthly report included.
+
+It was **not** a permission failure returning zero instead of refusing. That was worth ruling out explicitly: a cost gate that answers ₹0 rather than "not allowed" would be a quiet, repeatable way to put a wrong number in front of someone. A technician gets a blank, confirmed by a real call.
+
+September, before and after: profit-and-loss ₹105,073 → ₹48,754.10 (spares cost ₹0 → ₹56,318.90); sales report gross margin ₹125,980 → ₹69,311.10; October ₹26,430 → ₹16,349. The monthly report, day-wise, month-wise, monthly summary, profit report and drawings profit read ₹48,754.10 both before and after — they were always right. Every job's margin summed gives ₹56,318.90 spares cost, matching.
+
+**Where the owner was actually exposed.** Not the profit-and-loss: that page was taken off the screens on 7 September, four days before the first bill, so nobody ever saw ₹105,073. The live fault was the **"Cost · Profit" line on the bill screen**, which since 11 September has shown every job bill at cost ₹0 and profit equal to the whole bill — INV/0134 read cost ₹0, profit ₹1,500 where the truth is cost ₹600, profit ₹900. That is the one to tell him about, and the distinction was worth getting right: a ₹56,000 error on a hidden page and a per-bill error on a page he uses every day are different conversations.
+
+**A cost of the fix, stated:** job bill lines are not linked to a spare, so per-item and per-brand margin columns now show blank rather than a false full margin.
+
+## Money due from customers
+
+Dashboard ₹6,550 against reconciliation ₹6,700. Traced to one document rather than guessed at: **Prakash, INV/2026-27/0130, ₹150**, paid on 30 September through receipt RCP/2026-27/0002 which was never matched to the bill. His ledger correctly showed ₹0 owed, so the dashboard was right and the reconciliation was counting a paid bill as unpaid. A receipt not tied to a bill now settles what that customer owes. Both read ₹6,550; suppliers agree at ₹59,731; the Books check gap is ₹0.00.
+
+His bill still shows "Balance ₹150" on the bill screen — matching that receipt to the bill is the owner's action, so nothing was changed there.
+
+A ₹5 movement in the dashboard figure between two readings (₹6,555 → ₹6,550) is **not yet traced**.
+
+## A purchase cost leak, found by asking the right question
+
+The movement-history round ended with the agent volunteering that a technician can reach the purchases page on his own — which would make hiding the link on a movement row cosmetic. Chased, and it was half right.
+
+The purchases page itself is closed at the database: totals, line amounts and per-line money all refused, leaving supplier, bill number, date, items and quantities. But the **purchase report handed a technician September's total (₹58,701), every bill's total and per-item purchase values** — ₹4,630 for a OnePlus frame among them. The page is not on the screens, but anyone signed in could ask the database for it directly. Now refused: "You do not have permission to view purchase cost". The owner still gets ₹58,701.
+
+This is the fifth gap of the same shape. The pattern is consistent enough to state as a rule: a screen being off the menu is not a permission.
+
+## SVS Mobiles, ₹38,270 to ₹37,650
+
+Noticed and left untraced in one round, traced in the next rather than written off as "probably real shop activity": PB/2026-27/0061 amended from ₹1,600 to ₹750 at 10:28, and PB/2026-27/0091 entered at ₹230 at 10:43. ₹38,270 − ₹850 + ₹230 = ₹37,650. Both real.
