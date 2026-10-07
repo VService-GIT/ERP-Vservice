@@ -1358,3 +1358,17 @@ Refusals proved by real calls, not by reading the code: cancelled bill, overpaym
 Row counts identical before and after on all four tables: no residue.
 
 **Not checked:** the screen itself, the printed bill, the WhatsApp message and the report downloads. All of them need a signed-in owner view, which this project still cannot produce.
+
+## Two service items that were pretending to be stock
+
+Found while clearing the date-move blocks: "Rework service Charge" was set up as a stocked spare, so a job carrying it was refused a date move like any other part. Five items turned out to be in that state. The owner converted two — **General service** and **General service - Samsung A35**, both ₹1 placeholders — and deliberately left three alone: Rework service Charge, Software - Apple 6s and Software - Samsung M01 core carry a real bought-in cost of ₹2,100 that today correctly reaches the job's margin. As plain services that cost would stop reaching it and reported profit would rise by ₹2,100 unless booked as an expense instead. The price of leaving them as stock is that JOB/0116 cannot be billed before 3 October — which is right, since that is the day the rework was bought.
+
+**The thing worth proving was not the conversion.** It was that the owner can still charge ₹50 for a general service afterwards. A conversion that tidied the item list and broke his ability to bill labour would be worse than the problem it fixed. Proved by adding General service ₹50 to a real job and delivering it: the bill came out at ₹550 with a "service ₹50" line and no stock touched, the same shape as the bills already printed. The test job was returned to Ready for delivery and the bill removed.
+
+**History kept.** All three movements on each item are untouched — bought on PB/2026-27/0006 and /0008 from Sathya V Connect on 1 Sep, issued, returned the next day. Services drop out of the spares picker, so buttons were added beneath it to open their past movements rather than stranding them.
+
+**Loose ends closed in the same pass:** count sheets, stock adjustments and transfers no longer offer service items, and issuing a service to a job as a spare is now refused with "Add it as a labour or service charge." Low-stock warnings and dead stock were checked and unaffected.
+
+**A ₹2 disagreement this created, stated rather than buried:** the two ₹1 units still exist, so the Current stock page (which drops services) reads ₹29,268.60 while the monthly summary and stock reports still count them at ₹29,270.60. Cancelling the two placeholder purchases closes it. Left for the owner.
+
+**It also corrected the outstanding-work list in these docs.** JOB/0006 was recorded here as waiting to be handed back with General service ×1 at ₹50. It was delivered on 15 September and billed as INV/2026-27/0005, the ₹50 charged as labour rather than as the item. Neither that bill nor JOB/0008's ever carried the item, so nothing printed changes — but a list of outstanding work is worth no more than its last check against the data.

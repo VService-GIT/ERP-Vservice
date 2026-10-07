@@ -2,13 +2,24 @@
 
 ## Needs the owner
 
-- **Hand back the remaining five jobs.** 0007 and 0008 are billed already
-  (INV/2026-27/0002 ₹200, /0003 ₹100). Five left at Ready for delivery.
+- **Hand back the jobs still at Ready for delivery.**
   **Re-issue the parts on the Parts tab first** — Hand back creates the bill but does
   not issue parts. It now warns when a job has returned parts and nothing issued, but
   the warning does not block. 0003 Outer Button Redmi 10A ×1 @ ₹150; 0004 Display M31
-  ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150; 0006 General service ×1 @ ₹50. 0001 and
-  0048 are labour only (₹150 and ₹200).
+  ×1 @ ₹1,800 and Outer Button M31 ×1 @ ₹150. 0001 and 0048 are labour only (₹150 and
+  ₹200). *This list was stale and is corrected: 0006 was delivered on 15 Sep and
+  billed as INV/2026-27/0005 for ₹50, charged as labour rather than as the General
+  service item; 0007 and 0008 were billed as INV/2026-27/0002 ₹200 and /0003 ₹100.
+  A list of outstanding work is worth no more than its last check against the data.*
+
+- **Cancel PB/2026-27/0006 and PB/2026-27/0008, or say to leave them.** Two ₹1
+  placeholder purchases from Sathya V Connect, one unit each, bought on 1 Sep as the
+  General service items. Now that those two items are services, the units they left
+  behind make two screens disagree: the Current stock page drops services and reads
+  **₹29,268.60**, while the monthly summary and stock reports still count them and
+  read **₹29,270.60**. Cancelling both bills closes the ₹2 gap and goes back to 1 Sep,
+  their own date. A write-off is the wrong instrument — it would leave Sathya V
+  Connect owed ₹2 for nothing.
 
 - **Create two logins and add four secrets.** This is the item that unblocks the
   others: a dedicated owner-level test account and the technician account still
